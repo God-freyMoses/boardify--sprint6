@@ -1,0 +1,127 @@
+<body>
+<div class="container">
+  <aside class="sidebar">
+    <div class="logo">Boardify</div>
+    <nav>
+      <ul>
+        <li (click)="navigateToDashboard()" style="cursor: pointer;">  <i class="bi bi-speedometer2"></i> Dashboard</li>
+        <li class="active" (click)="navigateToNewHires()" style="cursor: pointer;"><i class="bi bi-people"></i> Employees</li>
+        <li><i class="bi bi-layout-text-window-reverse"></i> Templates</li>
+        <li><i class="bi bi-list-task"></i> Routine</li>
+      </ul>
+    </nav>
+    <div class="cta">
+<!--      <p> <i class="bi bi-person-plus"></i> Onboarding New Hires?</p> <button> <i class="bi bi-arrow-right-circle"></i> Begin here →</button>-->
+    </div>
+    <div class="bottom-links">
+      <p><i class="bi bi-gear"></i> Settings</p>
+      <p (click)="logout()" style="cursor: pointer; color: #dc3545;"><i class="bi bi-box-arrow-right"></i> Sign out</p>
+    </div>
+  </aside>
+
+<main class="main">
+
+  <header>
+    <h1>Onboard New Employee</h1>
+    <div class="header-actions">
+      <i class="bi bi-search"></i>
+      <i class="bi bi-bell"></i>
+      <div class="profile">
+        <span>Mark Grayson</span>
+        <p>Lead HR</p>
+      </div>
+    </div>
+  </header>
+
+  <section class="form-card">
+
+    <div class="form-layout">
+
+      <div *ngIf="(loading$ | async)" class="spinner">Submitting...</div>
+      <div *ngIf="(error$   | async)" class="error">
+        Error: {{ (error$ | async)?.error?.message || (error$ | async)?.message || 'An unexpected error occurred' }}
+      </div>
+    <form [formGroup]="form" (ngSubmit)="submit()">
+
+
+      <!-- STEP 1: Basic Information -->
+      <div *ngIf="step===1" class="step-content">
+        <h2>Enter Basic Information</h2>
+        <div class="grid two-col">
+          <label>First Name *</label>
+          <input formControlName="firstName" placeholder="Enter First Name" />
+          <label>Last Name *</label>
+          <input formControlName="lastName" placeholder="Enter Last Name" />
+          <label>Email *</label>
+          <input formControlName="email" placeholder="Enter Email ID" type="email" />
+          <label>Department *</label>
+          <select formControlName="departmentId" [disabled]="loadingDepartments">
+            <option value="">{{ loadingDepartments ? 'Loading departments...' : 'Select Department' }}</option>
+            <option *ngFor="let dept of departments" [value]="dept.name">{{ dept.name }}</option>
+          </select>
+          <label>Gender *</label>
+          <select formControlName="gender">
+            <option value="">Select Gender</option>
+            <option value="Male">Male</option>
+            <option value="Female">Female</option>
+            <option value="Other">Other</option>
+          </select>
+        </div>
+      </div>
+
+
+      <!-- STEP 2: Role & Others -->
+      <div *ngIf="step===2" class="step-content">
+        <h2>Role & Other Details</h2>
+        <div class="grid two-col">
+          <label>Title *</label>
+          <input formControlName="title" placeholder="Enter Job Title" />
+
+          <label>Role *</label>
+          <input formControlName="role" placeholder="Enter Role" />
+
+          <label>Upload Image</label>
+          <div class="upload-wrapper">
+            <i class="bi bi-upload"></i>
+            <input type="file" formControlName="pictureUrl" (change)="onFileSelected($event)" />
+          </div>
+
+          <label>Generate login password</label>
+          <div class="password-generator">
+            <input formControlName="password" placeholder="Auto-generated password" />
+            <button type="button" (click)="generatePassword()">
+              <i class="bi bi-shuffle"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- STEP 3: Review & Submit -->
+      <div *ngIf="step===3" class="step-content review">
+        <h2>Review & Submit</h2>
+        <pre>{{ form.value | json }}</pre>
+      </div>
+      <div class="actions">
+        <button type="button" class="link" (click)="back()" [disabled]="step===1">Cancel</button>
+        <button type="button" (click)="back()" *ngIf="step>1">Back</button>
+        <button type="button" (click)="next()" *ngIf="step<3">Next &gt;</button>
+        <button type="submit" class="primary" *ngIf="step===3">Submit</button>
+      </div>
+    </form>
+
+        <div class="steps">
+          <div [class.active]="step===1">1<br/><small>Basic details</small></div>
+          <div class="divider"></div>
+          <div [class.active]="step===2">2<br/><small>Role & Others</small></div>
+          <div class="divider"></div>
+          <div [class.active]="step===3">3<br/><small>Review & Submit</small></div>
+        </div>
+      </div>
+
+
+
+  </section>
+</main>
+</div>
+</body>
+

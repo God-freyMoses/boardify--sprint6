@@ -1,0 +1,83 @@
+<body>
+<div class="container">
+  <aside class="sidebar">
+    <div class="logo">Boardify</div>
+    <nav>
+      <ul>
+        <li (click)="navigateToDashboard()" style="cursor: pointer;">  <i class="bi bi-speedometer2"></i> Dashboard</li>
+        <li class="active"><i class="bi bi-people"></i> Employees</li>
+        <li><i class="bi bi-layout-text-window-reverse"></i> Templates</li>
+        <li><i class="bi bi-list-task"></i> Routine</li>
+      </ul>
+    </nav>
+    <div class="cta">
+      <p> <i class="bi bi-person-plus"></i> Onboarding New Hires?</p> <button (click)="navigateToOnboardNewHires()"> <i class="bi bi-arrow-right-circle"></i> Begin here →</button>
+    </div>
+    <div class="bottom-links">
+      <p><i class="bi bi-gear"></i> Settings</p>
+      <p (click)="logout()" style="cursor: pointer; color: #dc3545;"><i class="bi bi-box-arrow-right"></i> Sign out</p>
+    </div>
+  </aside>
+
+    <main class="main">
+      <header>
+        <h1>New Employees</h1>
+        <div class="header-actions">
+          <i class="bi bi-search"></i>
+          <i class="bi bi-bell"></i>
+          <div class="profile">
+            <span>Mark Grayson</span>
+            <p>Lead HR</p>
+          </div>
+        </div>
+      </header>
+
+<!--      <section class="breadcrumbs">-->
+<!--        <small><i class="bi bi-house-door"></i> Employees / New Employees ({{employees.length}})</small>-->
+<!--      </section>-->
+
+      <section class="employees-table">
+        <div class="search-bar">
+          <input type="text" placeholder="Search…" [(ngModel)]="filterText"/>
+        </div>
+
+        <table>
+          <thead>
+          <tr>
+            <th>Employee Name & Designation</th>
+            <th>Emp. ID</th>
+            <th>Joining Date</th>
+            <th>Reporting To</th>
+            <th>Approval Status</th>
+          </tr>
+          </thead>
+          <tbody>
+
+          <tr *ngFor="let e of filteredEmployees">
+            <td class="emp-name">
+              <img [src]="e.pictureUrl || 'assets/default-avatar.jpg'" alt="" class="avatar"/>
+              <div>
+                <div class="name">{{ e.firstName }} {{ e.lastName }}</div>
+                <div class="designation">{{ e.title }}</div>
+              </div>
+            </td>
+            <td>{{ e.id }}</td>
+            <td>{{ e.createdAt | date:'dd-MMM-yyyy' }}</td>
+            <td>{{ e.hrManagerName || 'N/A' }}</td>
+            <td>
+                <span class="badge pending">
+                  Pending
+                </span>
+            </td>
+          </tr>
+          </tbody>
+
+        </table>
+      </section>
+    </main>
+
+</div>
+
+</body>
+
+

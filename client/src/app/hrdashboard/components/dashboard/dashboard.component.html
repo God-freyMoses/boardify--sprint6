@@ -1,0 +1,145 @@
+<body>
+<div class="container">
+  <aside class="sidebar">
+    <div class="logo">Boardify</div>
+    <nav>
+      <ul>
+        <li class="active">  <i class="bi bi-speedometer2"></i> Dashboard</li>
+        <li (click)="navigateToNewHires()" style="cursor: pointer;"><i class="bi bi-people"></i> Employees</li>
+        <li><i class="bi bi-layout-text-window-reverse"></i> Templates</li>
+        <li><i class="bi bi-list-task"></i> Routine</li>
+      </ul>
+    </nav>
+    <div class="cta">
+      <p> <i class="bi bi-person-plus"></i> Onboarding New Hires?</p> <button (click)="navigateToOnboardNewHires()"> <i class="bi bi-arrow-right-circle"></i> Begin here →</button>
+    </div>
+    <div class="bottom-links">
+      <p><i class="bi bi-gear"></i> Settings</p>
+      <p (click)="logout()" style="cursor: pointer; color: #dc3545;"><i class="bi bi-box-arrow-right"></i> Sign out</p>
+    </div>
+  </aside>
+  <main class="main">
+    <header>
+      <h1>Welcome to the HR Management</h1>
+      <div class="header-actions">
+        <i class="bi bi-search"></i>
+        <i class="bi bi-bell"></i>
+        <div class="profile">
+          <span>{{ currentUser ? (currentUser.firstName + ' ' + currentUser.lastName) : 'HR Manager' }}</span>
+          <p>{{ currentUser?.role === 'HR_MANAGER' ? 'Lead HR' : 'HR Manager' }}</p>
+        </div>
+      </div>
+    </header>
+    <section class="stats">
+      <div class="stat blue">
+        <h2>12</h2>
+        <p>New Employees</p>
+      </div>
+      <div class="stat">
+        <h2>469</h2>
+        <p>Active Employees</p>
+      </div>
+      <div class="stat">
+        <h2>09</h2>
+        <p>Onboarded Emp..</p>
+      </div>
+      <div class="stat">
+        <h2>485</h2>
+        <p>Total Employees</p>
+      </div>
+    </section>
+    <section class="content">
+      <div class="left">
+        <div class="card">
+          <h3>New Employees</h3>
+          <table>
+            <thead>
+            <tr>
+              <th>Name & Designation</th>
+              <th>Status</th>
+              <th>Joined on</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr>
+              <td>Arun Raj Krishna - UX Designer</td>
+              <td><span class="badge pending">Pending</span></td>
+              <td>12-Mar-2024</td>
+            </tr>
+            <tr>
+              <td>Tany C Chauhan - Database Programmer</td>
+              <td><span class="badge in-progress">In-progress</span></td>
+              <td>12-Mar-2024</td>
+            </tr>
+            <tr>
+              <td>Jyothi Joshi - Automation Tester</td>
+              <td><span class="badge in-progress">In-progress</span></td>
+              <td>12-Mar-2024</td>
+            </tr>
+            <tr>
+              <td>Sameer Hasan - Software Engineer</td>
+              <td><span class="badge pending">Pending</span></td>
+              <td>12-Mar-2024</td>
+            </tr>
+            <tr>
+              <td>Varun Raj Krishna - UX Designer</td>
+              <td><span class="badge pending">Pending</span></td>
+              <td>12-Mar-2024</td>
+            </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="card department-overview">
+          <div class="department-card">
+            <h4>IT Department</h4>
+            <ul class="dept-stats">
+              <li><strong>125</strong> Active Employees</li>
+              <li><strong>8</strong> Open Tickets</li>
+              <li><strong>4</strong> New Hires</li>
+            </ul>
+            <button class="small">View IT Details</button>
+          </div>
+          <div class="department-card">
+            <h4>Marketing Department</h4>
+            <ul class="dept-stats">
+              <li><strong>67</strong> Active Employees</li>
+              <li><strong>3</strong> Campaigns Running</li>
+              <li><strong>2</strong> New Hires</li>
+            </ul>
+            <button class="small">View Marketing Details</button>
+          </div>
+          <div class="department-card">
+            <h4>Sales Department</h4>
+            <ul class="dept-stats">
+              <li><strong>142</strong> Active Employees</li>
+              <li><strong>24</strong> Deals Closed</li>
+              <li><strong>5</strong> New Hires</li>
+            </ul>
+            <button class="small">View Sales Details</button>
+          </div>
+          <div class="department-card">
+            <h4>Finance Department</h4>
+            <ul class="dept-stats">
+              <li><strong>38</strong> Active Employees</li>
+              <li><strong>7</strong> Budgets Approved</li>
+              <li><strong>1</strong> New Hire</li>
+            </ul>
+            <button class="small">View Finance Details</button>
+          </div>
+        </div>
+
+      </div>
+      <div class="right">
+        <div class="card">
+          <h3>Onboarding Routine</h3>
+          <div class="routine-calendar">
+            <!-- <full-calendar [options]="calendarOptions"></full-calendar> -->
+          </div>
+          <p class="note">As per the HR rules, you need to onboard all the new hires within the first week of joining.
+          </p> <button>Schedule Onboarding</button>
+        </div>
+      </div>
+    </section>
+  </main>
+</div>
+</body>

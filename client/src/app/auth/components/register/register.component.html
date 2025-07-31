@@ -1,0 +1,139 @@
+<div class="register-container">
+  <div class="register-card">
+    <div class="header">
+      <h1>Create Account</h1>
+      <p>Get started as an HR Admin</p>
+    </div>
+
+    <form [formGroup]="form" (ngSubmit)="onSubmit()" class="register-form">
+      <!-- Error Message -->
+      <div *ngIf="errorMessage" class="error-message">
+        {{ errorMessage }}
+      </div>
+
+      <!-- First Name and Last Name Row -->
+      <div class="form-row">
+        <div class="form-group">
+          <label for="firstName">First Name</label>
+          <input
+            type="text"
+            id="firstName"
+            formControlName="firstName"
+            [class.error]="isFieldInvalid('firstName')"
+            placeholder="Enter your first name"
+          />
+          <div *ngIf="isFieldInvalid('firstName')" class="field-error">
+            {{ getFieldError('firstName') }}
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="lastName">Last Name</label>
+          <input
+            type="text"
+            id="lastName"
+            formControlName="lastName"
+            [class.error]="isFieldInvalid('lastName')"
+            placeholder="Enter your last name"
+          />
+          <div *ngIf="isFieldInvalid('lastName')" class="field-error">
+            {{ getFieldError('lastName') }}
+          </div>
+        </div>
+      </div>
+
+      <!-- Email and Company Name Row -->
+      <div class="form-row">
+        <div class="form-group">
+          <label for="email">Email</label>
+          <input
+            type="email"
+            id="email"
+            formControlName="email"
+            [class.error]="isFieldInvalid('email')"
+            placeholder="Enter your email"
+          />
+          <div *ngIf="isFieldInvalid('email')" class="field-error">
+            {{ getFieldError('email') }}
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="companyName">Company Name</label>
+          <input
+            type="text"
+            id="companyName"
+            formControlName="companyName"
+            [class.error]="isFieldInvalid('companyName')"
+            placeholder="Enter your company name"
+          />
+          <div *ngIf="isFieldInvalid('companyName')" class="field-error">
+            {{ getFieldError('companyName') }}
+          </div>
+        </div>
+      </div>
+
+      <!-- Password and Confirm Password Row -->
+      <div class="form-row">
+        <div class="form-group">
+          <label for="password">Password</label>
+          <div class="password-input">
+            <input
+              [type]="showPassword ? 'text' : 'password'"
+              id="password"
+              formControlName="password"
+              [class.error]="isFieldInvalid('password')"
+              placeholder="Enter your password"
+            />
+            <button
+              type="button"
+              class="toggle-password"
+              (click)="togglePassword()"
+            >
+              <i [class]="showPassword ? 'bi bi-eye' : 'bi bi-eye-slash-fill'"></i>
+            </button>
+          </div>
+          <div *ngIf="isFieldInvalid('password')" class="field-error">
+            {{ getFieldError('password') }}
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="confirmPassword">Confirm Password</label>
+          <input
+            type="password"
+            id="confirmPassword"
+            formControlName="confirmPassword"
+            [class.error]="isFieldInvalid('confirmPassword') || passwordMismatch"
+            placeholder="Confirm your password"
+          />
+          <div *ngIf="isFieldInvalid('confirmPassword')" class="field-error">
+            {{ getFieldError('confirmPassword') }}
+          </div>
+          <div *ngIf="passwordMismatch" class="field-error">
+            Passwords do not match
+          </div>
+        </div>
+      </div>
+
+      <!-- Login Link -->
+      <div class="login-link">
+        <a routerLink="/login">Already have an account?</a>
+      </div>
+
+      <!-- Submit Button -->
+      <button
+        type="submit"
+        class="submit-btn"
+        [disabled]="form.invalid || isLoading"
+      >
+        <span *ngIf="isLoading" class="spinner"></span>
+        {{ isLoading ? 'Registering...' : 'Register' }}
+      </button>
+    </form>
+  </div>
+  <button type="button" class="back-btn" aria-label="Back to Dashboard" routerLink="/plan">
+    Back
+  </button>
+
+</div>

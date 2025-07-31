@@ -1,0 +1,99 @@
+
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&display=swap');
+
+:root {
+  --primary-dark: #16423C;
+  --primary-green: #6a9c89;
+  --primary-light: rgba(196, 218, 210, 0.69);
+  --background: #e9efec;
+
+  --neutral-light: #f1f0e9;
+  --forest-green: #41644a;
+  --deep-green: #0d4715;
+  --accent-orange: rgb(233, 118, 43);
+  --white: #ffffff;
+  --gray-dark: #475569;
+
+--status-success: #A2DF77;
+--status-warning: #F5EB14;
+--status-caution: #EC8607;
+--status-danger:  #C50707;
+
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html,
+body {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+
+}
+
+
+.landing-container {
+  flex: 1;
+}
+
+
+a {
+  text-decoration: none;
+  color: inherit;
+}
+
+ul {
+  list-style-type: none;
+}
+
+.text-center {
+  text-align: center;
+}
+
+.flex {
+  display: flex;
+}
+
+.flex-center {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.btn {
+  padding: 0.8rem 1.5rem;
+  background-color: var(--accent-orange);
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.btn:hover {
+  background-color: var(--primary-dark);
+}
+
+
+::-webkit-scrollbar {
+  width: 5px;
+  height: 5px;
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: var(--primary-dark);
+  border-radius: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--background);
+}
+
+/*.section{*/
+/*  scroll-margin-top: 80px;*/
+/*}*/

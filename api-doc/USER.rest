@@ -1,0 +1,53 @@
+##### VARIABLES
+@SERVER = http://10.100.2.101:8080/api/users
+@USER = user
+@PASSWORD = 123456
+@TOKEN = Bearer XXXXXXXXXXXXXXX
+
+
+
+##### REGISTER USER
+POST {{SERVER}}/register/hr
+Content-Type: application/json
+
+{ "firstName": "God",
+  "lastName": "Moses",
+  "email": "neo@gmail.com",
+  "companyName": "GodMoses",
+  "password": "password1",
+  "role": "HR_MANAGER"
+
+}
+
+
+
+##### LOGIN USER
+POST {{SERVER}}/login
+Content-Type: application/json
+
+{
+  "username": "neo@gmail.com",
+  "password": "123456"
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

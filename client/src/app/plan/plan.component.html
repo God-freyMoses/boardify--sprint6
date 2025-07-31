@@ -1,0 +1,73 @@
+<div class="plan-page-wrapper">
+  <h1 class="page-title">Choose Your Boardi.fy Plan</h1>
+
+  <div class="plans-container">
+
+
+    <div class="plan-card">
+      <h2 class="plan-name">Free</h2>
+      <p class="plan-price">R0/month</p>
+      <ul class="features">
+        <li>Basic onboarding features</li>
+        <li>Maximum 8 hires</li>
+        <li>1 active onboarding flow</li>
+        <li>Limited to 3 document uploads</li>
+        <li>Email support</li>
+      </ul>
+      <button class="select-btn-free">
+        <a routerLink="/register"> Current Plan</a>
+      </button>
+    </div>
+
+    <div class="plan-card">
+      <h2 class="plan-name">Basic</h2>
+      <p class="plan-price">R99/month</p>
+      <ul class="features">
+        <li>Basic onboarding features</li>
+        <li>Maximum 20 hires</li>
+        <li>Limited to 6 document uploads</li>
+        <li>Email support</li>
+      </ul>
+      <button class="select-btn-basic">
+        Choose Basic
+      </button>
+    </div>
+
+
+    <div class="plan-card popular">
+      <div class="ribbon">Most Popular</div>
+      <h2 class="plan-name">Pro</h2>
+      <p class="plan-price">R299/month</p>
+      <ul class="features">
+        <li>Unlimited onboarding journeys</li>
+        <li>Maximum 50 hires</li>
+        <li>Full Role-Based Templates</li>
+        <li>Checklist Customization</li>
+        <li>Unlimited Document Upload</li>
+        <li>Document Signing</li>
+        <li>Full Calendar Scheduling</li>
+        <li>Progress Tracking Dashboard</li>
+        <li>Basic Notifications & Reminders</li>
+        <li>Basic Reports</li>
+      </ul>
+      <button class="select-btn-pro">Choose Pro</button>
+    </div>
+
+
+    <div class="plan-card">
+      <h2 class="plan-name">Enterprise</h2>
+      <p class="plan-price">Custom pricing</p>
+      <ul class="features">
+        <li>Everything in Pro</li>
+        <li>Custom integrations</li>
+        <li>Dedicated onboarding manager</li>
+        <li>24/7 priority support</li>
+      </ul>
+      <button class="select-btn-enterprise">Contact Us</button>
+    </div>
+  </div>
+  <button type="button" class="back-btn" aria-label="Back to Dashboard" [routerLink]="['/home']">
+    Back
+  </button>
+</div>
+

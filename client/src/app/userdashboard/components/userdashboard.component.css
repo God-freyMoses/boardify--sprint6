@@ -1,0 +1,350 @@
+:host {
+  display: block;
+  min-height: 100vh;
+  font-family: 'Outfit', sans-serif;
+  background-color: #e9efec;
+  scroll-behavior: smooth;
+}
+
+
+  .dashboard-container {
+    display: flex;
+    margin-top: 60px;
+  }
+
+
+  .sidebar {
+    width: 240px;
+    height: 100vh;
+    position: fixed;
+    top: 0;
+    left: 0;
+    background-color: #16423c;
+    color: #fff;
+    padding: 2rem 1.5rem;
+    display: flex;
+    flex-direction: column;
+    z-index: 999;
+  }
+
+  .sidebar .logo {
+    font-size: 2rem;
+    font-weight: 700;
+    text-align: center;
+    margin-bottom: 4rem;
+  }
+
+  .nav-links {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 4rem;
+  }
+
+  .nav-links li {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    font-size: 1rem;
+    cursor: pointer;
+    font-weight: 600;
+    transition: all 0.3s ease;
+  }
+
+  .nav-links li:hover {
+    color: #e9762b;
+    transform: translateX(4px);
+  }
+
+.nav-links li.active {
+  color: #e9762b;
+  border-left: 4px solid #e9762b;
+  padding-left: 0.75rem;
+  background-color: rgba(255, 255, 255, 0.05);
+  border-radius: 4px;
+}
+
+  .main-content {
+    margin-left: 240px;
+    padding: 3rem 2rem;
+    flex: 1;
+    background-color: #f5f7f6;
+    display: flex;
+    flex-direction: column;
+    gap: 2.5rem;
+  }
+
+  .profile-section {
+    position: absolute;
+    top: 1.5rem;
+    right: 2rem;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    z-index: 10;
+  }
+.profile-pic {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid #6a9c89;
+}
+
+  .welcome-text {
+    font-size: 2.25rem;
+    font-weight: 700;
+    color: #16423c;
+  }
+
+  .stats-cards {
+    display: flex;
+    gap: 2rem;
+    flex-wrap: wrap;
+  }
+
+  .card {
+    background-color: #fff;
+    border-radius: 16px;
+    padding: 2rem;
+    flex: 1 1 240px;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+    text-align: center;
+    transition: transform 0.3s ease;
+  }
+
+  .card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+  }
+
+  .total-number {
+    font-size: 2.25rem;
+    font-weight: 700;
+    color: #16423c;
+    margin-bottom: 0.5rem;
+  }
+
+  .caption span {
+    font-size: 0.9rem;
+    color: #555;
+  }
+
+  .overall-progress-label {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #16423c;
+    margin-bottom: 0.5rem;
+    margin-top: 0rem;
+  }
+
+  .overall-progress-bar-wrapper {
+    width: 100%;
+    background-color: rgba(233, 118, 43, 0.15);
+    border-radius: 9999px;
+    overflow: hidden;
+    height: 12px;
+    margin-bottom: 1.5rem;
+    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
+  }
+
+  .overall-progress-bar {
+    height: 100%;
+    background: linear-gradient(90deg, #e9762b, #fba457);
+    transition: width 0.4s ease-in-out;
+    width: 45%;
+    border-radius: inherit;
+  }
+
+  .tasks-section,
+  .notifications-section,
+  .events-section,
+  .quick-links-section {
+    background-color: #fff;
+    border-radius: 16px;
+    padding: 2rem;
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.06);
+    transition: box-shadow 0.3s ease, transform 0.2s ease;
+  }
+
+  .tasks-section:hover,
+  .notifications-section:hover,
+  .events-section:hover,
+  .quick-links-section:hover {
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+    transform: translateY(-2px);
+  }
+
+  .tasks-section h2,
+  .notifications-section h2,
+  .events-section h2,
+  .quick-links-section h2 {
+    font-size: 1.3rem;
+    font-weight: 600;
+    color: #16423c;
+    border-bottom: 1px solid #e0e0e0;
+    padding-bottom: 0.5rem;
+    margin-bottom: 1.2rem;
+  }
+
+  .task-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+.task-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: #f1f0e9;
+  padding: 0.75rem 1rem;
+  border-radius: 10px;
+  transition: all 0.3s ease;
+}
+
+.task-item:hover {
+  background-color: #e9efec;
+  transform: translateY(-2px);
+}
+
+.task-item input[type="checkbox"] {
+  accent-color: #6a9c89;
+  transform: scale(1.2);
+  cursor: pointer;
+}
+
+.task-item label {
+  flex: 1;
+  margin-left: 0.75rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: color 0.3s ease;
+}
+
+.task-item input[type="checkbox"]:checked + label {
+  text-decoration: line-through;
+  color: #999;
+}
+
+.due-date {
+  font-size: 0.85rem;
+  color: #e9762b;
+  white-space: nowrap;
+}
+.notifications-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.notification {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  background-color: #f6f9f8;
+  padding: 1rem;
+  border-radius: 10px;
+  font-size: 0.95rem;
+  color: #333;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.notification:hover {
+  background-color: #e9efec;
+  transform: translateY(-2px);
+}
+
+.notification i {
+  font-size: 1.25rem;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.notification.reminder i {
+  color: #6a9c89;
+}
+.notification.update i {
+  color: #fba457;
+}
+.notification.alert i {
+  color: #e9762b;
+}
+
+.view-all {
+  margin-top: 1rem;
+  font-size: 0.9rem;
+  color: #e9762b;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+
+.view-all {
+    margin-top: 1rem;
+    font-size: 0.9rem;
+    color: #e9762b;
+    text-decoration: underline;
+    cursor: pointer;
+  }
+
+  .notifications-list,
+  .events-list,
+  .quick-links-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    font-size: 0.95rem;
+    color: #333;
+  }
+
+  .notifications-list li,
+  .events-list li,
+  .quick-links-list li {
+    background-color: #f6f9f8;
+    padding: 0.75rem 1rem;
+    border-radius: 8px;
+    transition: background-color 0.3s ease;
+  }
+
+  .notifications-list li:hover,
+  .events-list li:hover,
+  .quick-links-list li:hover {
+    background-color: #e9efec;
+  }
+
+  .notifications-list li strong,
+  .events-list li strong {
+    color: #6a9c89;
+    margin-right: 0.3rem;
+  }
+
+  .quick-links-list li a {
+    color: #6a9c89;
+    font-weight: 600;
+    text-decoration: none;
+    display: inline-block;
+    width: 100%;
+  }
+
+  .quick-links-list li a:hover {
+    color: #e9762b;
+    text-decoration: underline;
+  }
+
+  .text-green {
+    color: #3aa369;
+  }
+
+  .text-red {
+    color: #d9534f;
+  }
+

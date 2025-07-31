@@ -1,0 +1,106 @@
+<div class="dashboard-wrapper">
+
+  <aside class="sidebar">
+    <div class="logo">Boardi.fy</div>
+    <ul class="nav-links">
+      <li (click)="navigateToDashboard()" style="cursor: pointer;"><i class="bi bi-speedometer2"></i> Dashboard</li>
+      <li (click)="navigateToTasks()" style="cursor: pointer;"><i class="bi bi-list-check"></i> Tasks</li>
+      <li (click)="navigateToDocuments()" style="cursor: pointer;"><i class="bi bi-file-earmark-text"></i> Documents</li>
+      <li (click)="navigateToResources()" style="cursor: pointer;"><i class="bi bi-folder2-open"></i> Resources</li>
+      <li (click)="navigateToEvents()" style="cursor: pointer;"><i class="bi bi-calendar-event"></i> Events</li>
+      <li (click)="navigateToSettings()" style="cursor: pointer;"><i class="bi bi-gear"></i> Settings</li>
+      <li (click)="logout()" style="cursor: pointer; color: #dc3545;"><i class="bi bi-box-arrow-right"></i> Logout</li>
+    </ul>
+  </aside>
+
+  <div class="main-content">
+    <!-- Dashboard content -->
+    <div class="dashboard-content">
+      <div class="welcome-text">Welcome {{ currentUser ? currentUser.firstName : 'User' }}!</div>
+
+      <div class="overall-progress-bar-wrapper" aria-label="Overall progress">
+        <div class="overall-progress-bar" style="width: 45%; transition: width 0.6s ease;"></div>
+      </div>
+
+      <div class="profile-section">
+        <img [src]="'https://ui-avatars.com/api/?name=' + (currentUser ? (currentUser.firstName + '+' + currentUser.lastName) : 'User') + '&background=6a9c89&color=fff&size=128'" alt="Profile" class="profile-pic"/>
+        <h4>{{ currentUser ? (currentUser.firstName + ' ' + currentUser.lastName) : 'User' }}</h4>
+      </div>
+
+      <div class="stats-cards">
+        <div class="card pending">
+          <i class="bi bi-hourglass-split icon"></i>
+          <div class="total-number">12</div>
+          <div class="caption"><span>Pending Tasks</span></div>
+        </div>
+
+        <div class="card completed">
+          <i class="bi bi-check-circle icon"></i>
+          <div class="total-number">5</div>
+          <div class="progress-bar-container">
+            <div class="progress-bar" style="width: 70%"></div>
+          </div>
+          <span class="progress-label">70% Complete</span>
+          <div class="caption"><span>Completed</span></div>
+        </div>
+      </div>
+
+
+      <div class="tasks-section">
+        <h2>Today's Tasks</h2>
+        <div class="task-list">
+          <div class="task-item">
+            <input type="checkbox" />
+            <label>Submit Documents</label>
+            <span class="due-date">Due: Today</span>
+          </div>
+
+          <div class="task-item">
+            <input type="checkbox" id="task-meet-hr" />
+            <label for="task-meet-hr">Meet with HR</label>
+            <span class="due-date">Due: Tomorrow</span>
+          </div>
+          <a class="view-all" href="#">View all notifications</a>
+
+          <div class="notifications-section">
+            <h2>Notifications</h2>
+            <ul class="notifications-list">
+              <li class="notification reminder">
+                <i class="bi bi-bell-fill"></i>
+                <span><strong>Reminder:</strong> Submit your ID documents by Friday.</span>
+              </li>
+              <li class="notification update">
+                <i class="bi bi-calendar-event-fill"></i>
+                <span><strong>Update:</strong> HR meeting rescheduled to 3 PM.</span>
+              </li>
+              <li class="notification alert">
+                <i class="bi bi-exclamation-circle-fill"></i>
+                <span><strong>Alert:</strong> New onboarding materials available.</span>
+              </li>
+            </ul>
+            <a class="view-all" href="#">View all notifications</a>
+          </div>
+
+          <div class="events-section">
+            <h2>Upcoming Events</h2>
+            <ul class="events-list">
+              <li><strong>Team Building:</strong> July 30, 2025</li>
+              <li><strong>Quarterly Review:</strong> August 15, 2025</li>
+              <li><strong>Onboarding Webinar:</strong> August 20, 2025</li>
+            </ul>
+            <a class="view-all" href="#">View all Events</a>
+          </div>
+
+          <div class="quick-links-section">
+            <h2>Quick Links</h2>
+            <ul class="quick-links-list">
+               Example icon: bi bi-upload for upload docs
+               <li><a href="#"><i class="bi bi-upload"></i> Upload Documents</a></li>
+              <li><a href="#"><i class="bi bi-headset"></i> Request Support</a></li>
+              <li><a href="#"><i class="bi bi-file-earmark-text"></i> HR Policies</a></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+</div>

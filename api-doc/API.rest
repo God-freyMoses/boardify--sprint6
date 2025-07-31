@@ -1,0 +1,73 @@
+##### VARIABLES
+@SERVER = http://localhost:8080
+@USER = user
+@PASSWORD = 123456
+@TOKEN = Bearer XXXXXXXXXXXXXXX
+
+
+
+##### TEST IF SERVER IS UP
+GET {{SERVER}}
+
+##### CREATE DEPARTMENTS
+### Create Engineering Department
+POST {{SERVER}}/api/departments/create
+Content-Type: application/json
+
+{
+  "name": "Engineering",
+  "companyId": 1
+}
+
+### Create Marketing Department
+POST {{SERVER}}/api/departments/create
+Content-Type: application/json
+
+{
+  "name": "Marketing",
+  "companyId": 1
+}
+
+### Create Human Resources Department
+POST {{SERVER}}/api/departments/create
+Content-Type: application/json
+
+{
+  "name": "Human Resources",
+  "companyId": 1
+}
+
+### Create Sales Department
+POST {{SERVER}}/api/departments/create
+Content-Type: application/json
+
+{
+  "name": "Sales",
+  "companyId": 1
+}
+
+### Create Finance Department
+POST {{SERVER}}/api/departments/create
+Content-Type: application/json
+
+{
+  "name": "Finance",
+  "companyId": 1
+}
+
+##### VERIFY DEPARTMENTS
+### Get All Departments
+GET {{SERVER}}/api/departments
+Content-Type: application/json
+
+##### VERIFICATION RESULTS
+# Successfully created departments:
+# 1. Engineering (ID: 1)
+# 2. Marketing (ID: 2) 
+# 3. Human Resources (ID: 3)
+# 4. Sales (ID: 4)
+# 5. Finance (ID: 5)
+# 6. IT Support (ID: 52)
+#
+# All departments are now available in the database
+# and can be selected from the dropdown in the frontend
