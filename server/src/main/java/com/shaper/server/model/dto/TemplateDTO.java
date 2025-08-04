@@ -16,7 +16,7 @@ public class TemplateDTO {
     private String title;
     private String description;
     private String status;
-    private Integer hrId;
+    private String hrId;
     private String hrName;
     private List<Integer> taskIds;
     private List<Integer> departmentIds;

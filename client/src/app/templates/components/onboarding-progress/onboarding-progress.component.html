@@ -1,0 +1,267 @@
+<body>
+<div class="container">
+  <aside class="sidebar">
+    <div class="logo">Boardify</div>
+    <nav>
+      <ul>
+        <li (click)="navigateToUserDashboard()" style="cursor: pointer;"><i class="bi bi-speedometer2"></i> Dashboard</li>
+        <li class="active"><i class="bi bi-list-task"></i> My Onboarding</li>
+        <li><i class="bi bi-file-earmark-text"></i> Documents</li>
+        <li><i class="bi bi-bell"></i> Notifications</li>
+      </ul>
+    </nav>
+    <div class="cta">
+      <p><i class="bi bi-trophy"></i> Complete Your Onboarding</p>
+      <div class="progress-summary">
+        <div class="progress-circle">
+          <span>{{ getProgressPercentage() }}%</span>
+        </div>
+        <p>{{ getCompletedTasksCount() }} of {{ getTotalTasksCount() }} tasks completed</p>
+      </div>
+    </div>
+    <div class="bottom-links">
+      <p><i class="bi bi-gear"></i> Settings</p>
+      <p (click)="logout()" style="cursor: pointer; color: #dc3545;"><i class="bi bi-box-arrow-right"></i> Sign out</p>
+    </div>
+  </aside>
+  
+  <main class="main">
+    <header>
+      <h1>{{ template?.title || 'Onboarding Progress' }}</h1>
+      <div class="header-actions">
+        <i class="bi bi-search"></i>
+        <i class="bi bi-bell"></i>
+        <div class="profile">
+          <span>{{ currentUser ? (currentUser.firstName + ' ' + currentUser.lastName) : 'Employee' }}</span>
+          <p>New Employee</p>
+        </div>
+      </div>
+    </header>
+
+    <div class="error-message" *ngIf="error">
+      <i class="bi bi-exclamation-triangle"></i>
+      {{ error }}
+    </div>
+
+    <div class="loading" *ngIf="loading">
+      <i class="bi bi-arrow-clockwise spin"></i>
+      Loading your onboarding progress...
+    </div>
+
+    <div class="content" *ngIf="!loading">
+      <!-- Progress Overview -->
+      <section class="progress-section">
+        <div class="progress-card">
+          <div class="progress-header">
+            <h3><i class="bi bi-graph-up"></i> Your Progress</h3>
+            <span class="progress-percentage">{{ getProgressPercentage() }}%</span>
+          </div>
+          <div class="progress-bar">
+            <div class="progress-fill" [style.width.%]="getProgressPercentage()"></div>
+          </div>
+          <div class="progress-stats">
+            <div class="stat">
+              <span class="number">{{ getCompletedTasksCount() }}</span>
+              <span class="label">Completed</span>
+            </div>
+            <div class="stat">
+              <span class="number">{{ getTotalTasksCount() - getCompletedTasksCount() }}</span>
+              <span class="label">Remaining</span>
+            </div>
+            <div class="stat">
+              <span class="number">{{ getTotalTasksCount() }}</span>
+              <span class="label">Total Tasks</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Tasks and Todos -->
+      <section class="tasks-section">
+        <h3><i class="bi bi-list-check"></i> Your Tasks</h3>
+        
+        <div class="tasks-grid">
+          <!-- Todos -->
+          <div class="task-category" *ngIf="todos.length > 0">
+            <h4>Personal Tasks</h4>
+            <div class="task-list">
+              <div class="task-item" *ngFor="let todo of todos" [class.completed]="todo.isCompleted">
+                <div class="task-checkbox">
+                  <input 
+                    type="checkbox" 
+                    [checked]="todo.isCompleted" 
+                    (change)="markTodoComplete(todo.id!)"
+                    [disabled]="todo.isCompleted"
+                  >
+                </div>
+                <div class="task-content">
+                  <h5>{{ todo.title }}</h5>
+                  <p>{{ todo.description }}</p>
+                  <div class="task-meta">
+                    <span class="created-date">
+                      <i class="bi bi-calendar"></i>
+                      Created: {{ formatDate(todo.createdDate || '') }}
+                    </span>
+                  </div>
+                </div>
+                <div class="task-status">
+                  <span class="badge" [class.completed]="todo.isCompleted">
+                    {{ todo.isCompleted ? 'Completed' : 'Pending' }}
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Tasks -->
+          <div class="task-category" *ngIf="tasks.length > 0">
+            <h4>Assigned Tasks</h4>
+            <div class="task-list">
+              <div class="task-item" *ngFor="let task of tasks" [class.completed]="task.isCompleted">
+                <div class="task-checkbox">
+                  <input 
+                    type="checkbox" 
+                    [checked]="task.isCompleted" 
+                    (change)="markTaskComplete(task.id!)"
+                    [disabled]="task.isCompleted"
+                  >
+                </div>
+                <div class="task-content">
+                  <h5>{{ task.title }}</h5>
+                  <p>{{ task.description }}</p>
+                  <div class="task-meta">
+                    <span class="due-date" *ngIf="task.dueDate">
+                      <i class="bi bi-clock"></i>
+                      Due: {{ formatDate(task.dueDate) }}
+                    </span>
+                    <span class="created-date">
+                      <i class="bi bi-calendar"></i>
+                      Created: {{ formatDate(task.createdDate || '') }}
+                    </span>
+                  </div>
+                </div>
+                <div class="task-status">
+                  <span class="badge" [class.completed]="task.isCompleted">
+                    {{ task.isCompleted ? 'Completed' : 'Pending' }}
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="empty-tasks" *ngIf="todos.length === 0 && tasks.length === 0">
+          <i class="bi bi-list-task"></i>
+          <h4>No tasks assigned yet</h4>
+          <p>Your onboarding tasks will appear here once they are assigned by HR.</p>
+        </div>
+      </section>
+
+      <!-- Documents Section -->
+      <section class="documents-section">
+        <div class="section-header">
+          <h3><i class="bi bi-file-earmark-text"></i> Documents</h3>
+          <div class="upload-area">
+            <input 
+              type="file" 
+              id="fileInput" 
+              #fileInput
+              (change)="onFileSelected($event)" 
+              style="display: none;"
+            >
+            <button 
+              class="btn-secondary" 
+              (click)="triggerFileInput()"
+              [disabled]="uploadingFile"
+            >
+              <i class="bi bi-upload"></i> Upload Document
+            </button>
+            <button 
+              class="btn-primary" 
+              (click)="uploadDocument()" 
+              [disabled]="!selectedFile || uploadingFile"
+            >
+              <i class="bi bi-arrow-clockwise spin" *ngIf="uploadingFile"></i>
+              <i class="bi bi-check" *ngIf="!uploadingFile"></i>
+              {{ uploadingFile ? 'Uploading...' : 'Submit' }}
+            </button>
+          </div>
+        </div>
+
+        <div class="selected-file" *ngIf="selectedFile">
+          <i class="bi bi-file-earmark"></i>
+          <span>{{ selectedFile.name }}</span>
+          <span class="file-size">({{ formatFileSize(selectedFile.size) }})</span>
+        </div>
+
+        <div class="documents-list">
+          <div class="document-item" *ngFor="let document of documents">
+            <div class="document-icon">
+              <i class="bi bi-file-earmark-text"></i>
+            </div>
+            <div class="document-info">
+              <h5>{{ document.fileName }}</h5>
+              <div class="document-meta">
+                <span>{{ formatFileSize(document.fileSize) }}</span>
+                <span>Uploaded: {{ formatDate(document.createdDate || '') }}</span>
+                <span>By: {{ document.uploadedBy }}</span>
+              </div>
+            </div>
+            <div class="document-actions">
+              <button 
+                class="btn-secondary" 
+                (click)="downloadDocument(document.id!, document.fileName)"
+              >
+                <i class="bi bi-download"></i> Download
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div class="empty-documents" *ngIf="documents.length === 0">
+          <i class="bi bi-file-earmark"></i>
+          <h4>No documents yet</h4>
+          <p>Upload your onboarding documents here.</p>
+        </div>
+      </section>
+
+      <!-- Notifications Section -->
+      <section class="notifications-section">
+        <h3><i class="bi bi-bell"></i> Notifications</h3>
+        
+        <div class="notifications-list">
+          <div 
+            class="notification-item" 
+            *ngFor="let notification of notifications" 
+            [class.unread]="!notification.isRead"
+          >
+            <div class="notification-icon">
+              <i class="bi bi-info-circle" *ngIf="!notification.isRead"></i>
+              <i class="bi bi-check-circle" *ngIf="notification.isRead"></i>
+            </div>
+            <div class="notification-content">
+              <h5>{{ notification.title }}</h5>
+              <p>{{ notification.message }}</p>
+              <span class="notification-date">{{ formatDate(notification.createdDate || '') }}</span>
+            </div>
+            <div class="notification-actions" *ngIf="!notification.isRead">
+              <button 
+                class="btn-secondary" 
+                (click)="markNotificationAsRead(notification.id!)"
+              >
+                Mark as Read
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div class="empty-notifications" *ngIf="notifications.length === 0">
+          <i class="bi bi-bell-slash"></i>
+          <h4>No notifications</h4>
+          <p>You'll receive notifications about your onboarding progress here.</p>
+        </div>
+      </section>
+    </div>
+  </main>
+</div>
+</body>

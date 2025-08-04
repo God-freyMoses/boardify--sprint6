@@ -1,0 +1,238 @@
+<div class="container">
+  <aside class="sidebar">
+    <div class="logo">Boardify</div>
+    <nav>
+      <ul>
+        <li (click)="navigateToDashboard()" style="cursor: pointer;"><i class="bi bi-speedometer2"></i> Dashboard</li>
+        <li><i class="bi bi-people"></i> Employees</li>
+        <li (click)="navigateToTemplates()" style="cursor: pointer;"><i class="bi bi-layout-text-window-reverse"></i> Templates</li>
+        <li><i class="bi bi-list-task"></i> Routine</li>
+      </ul>
+    </nav>
+    <div class="cta">
+      <p><i class="bi bi-plus-circle"></i> Creating New Template</p>
+      <button (click)="navigateToTemplates()"><i class="bi bi-arrow-left-circle"></i> ← Back to Templates</button>
+    </div>
+    <div class="bottom-links">
+      <p><i class="bi bi-gear"></i> Settings</p>
+      <p (click)="logout()" style="cursor: pointer; color: #dc3545;"><i class="bi bi-box-arrow-right"></i> Sign out</p>
+    </div>
+  </aside>
+  
+  <main class="main">
+    <header>
+      <h1>Create New Onboarding Template</h1>
+      <div class="header-actions">
+        <i class="bi bi-search"></i>
+        <i class="bi bi-bell"></i>
+        <div class="profile">
+          <span>{{ currentUser ? (currentUser.firstName + ' ' + currentUser.lastName) : 'HR Manager' }}</span>
+          <div class="user-avatar">{{ currentUser?.firstName?.charAt(0) }}{{ currentUser?.lastName?.charAt(0) }}</div>
+        </div>
+      </div>
+    </header>
+
+    <section class="content">
+      <div class="form-container">
+        <div *ngIf="error" class="alert alert-error">
+          <i class="bi bi-exclamation-triangle"></i> {{ error }}
+        </div>
+        
+        <div *ngIf="success" class="alert alert-success">
+          <i class="bi bi-check-circle"></i> {{ success }}
+        </div>
+
+        <form [formGroup]="templateForm" (ngSubmit)="onSubmit()">
+          <!-- Template Basic Information -->
+          <div class="form-section">
+            <h3>Template Information</h3>
+            
+            <div class="form-group">
+              <label for="title">Template Title *</label>
+              <input 
+                type="text" 
+                id="title" 
+                formControlName="title" 
+                placeholder="Enter template title"
+                [class.error]="isFieldInvalid('title')">
+              <div *ngIf="isFieldInvalid('title')" class="error-message">
+                {{ getFieldError('title') }}
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="description">Template Description *</label>
+              <textarea 
+                id="description" 
+                formControlName="description" 
+                placeholder="Describe what this template is for"
+                rows="4"
+                [class.error]="isFieldInvalid('description')"></textarea>
+              <div *ngIf="isFieldInvalid('description')" class="error-message">
+                {{ getFieldError('description') }}
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="status">Initial Status *</label>
+              <select id="status" formControlName="status" [class.error]="isFieldInvalid('status')">
+                <option value="" disabled>Select status</option>
+                <option *ngFor="let status of templateStatuses" [value]="status">{{ status }}</option>
+              </select>
+              <div *ngIf="isFieldInvalid('status')" class="error-message">
+                {{ getFieldError('status') }}
+              </div>
+            </div>
+          </div>
+
+          <!-- Template Tasks -->
+          <div class="form-section">
+            <div class="section-header">
+              <h3><i class="bi bi-list-task"></i> Template Tasks</h3>
+              <button type="button" class="btn-add" (click)="addTask()">
+                <i class="bi bi-plus-circle"></i> Add Task
+              </button>
+            </div>
+
+            <div formArrayName="tasks" class="tasks-container">
+              <div *ngFor="let task of tasks.controls; let i = index" [formGroupName]="i" class="task-card">
+                <div class="task-header">
+                  <h4>Task {{ i + 1 }}</h4>
+                  <button type="button" class="btn-remove" (click)="removeTask(i)" [disabled]="tasks.length <= 1">
+                    <i class="bi bi-trash"></i>
+                  </button>
+                </div>
+
+                <div class="task-fields">
+                  <div class="form-group">
+                    <label [for]="'task-title-' + i">Task Title *</label>
+                    <input 
+                      type="text" 
+                      [id]="'task-title-' + i"
+                      formControlName="title" 
+                      placeholder="Enter task title"
+                      [class.error]="isTaskFieldInvalid(i, 'title')">
+                    <div *ngIf="isTaskFieldInvalid(i, 'title')" class="error-message">
+                      {{ getTaskFieldError(i, 'title') }}
+                    </div>
+                  </div>
+
+                  <div class="form-group">
+                    <label [for]="'task-description-' + i">Task Description *</label>
+                    <textarea 
+                      [id]="'task-description-' + i"
+                      formControlName="description" 
+                      placeholder="Describe what needs to be done"
+                      rows="3"
+                      [class.error]="isTaskFieldInvalid(i, 'description')"></textarea>
+                    <div *ngIf="isTaskFieldInvalid(i, 'description')" class="error-message">
+                      {{ getTaskFieldError(i, 'description') }}
+                    </div>
+                  </div>
+
+                  <div class="form-group">
+                    <label [for]="'task-type-' + i">Task Type *</label>
+                    <select [id]="'task-type-' + i" formControlName="taskType" [class.error]="isTaskFieldInvalid(i, 'taskType')">
+                      <option value="" disabled>Select task type</option>
+                      <option *ngFor="let type of taskTypes" [value]="type">{{ type }}</option>
+                    </select>
+                    <div *ngIf="isTaskFieldInvalid(i, 'taskType')" class="error-message">
+                      {{ getTaskFieldError(i, 'taskType') }}
+                    </div>
+                  </div>
+
+                  <div class="form-group">
+                    <label [for]="'task-priority-' + i">Priority *</label>
+                    <select [id]="'task-priority-' + i" formControlName="priority" [class.error]="isTaskFieldInvalid(i, 'priority')">
+                      <option value="" disabled>Select priority</option>
+                      <option *ngFor="let priority of taskPriorities" [value]="priority">{{ priority }}</option>
+                    </select>
+                    <div *ngIf="isTaskFieldInvalid(i, 'priority')" class="error-message">
+                      {{ getTaskFieldError(i, 'priority') }}
+                    </div>
+                  </div>
+
+                  <div class="form-group">
+                    <label [for]="'task-due-date-' + i">Due Date (Optional)</label>
+                    <input 
+                      type="date" 
+                      [id]="'task-due-date-' + i"
+                      formControlName="dueDate">
+                  </div>
+
+                  <!-- Event Date for Event Tasks -->
+                  <div *ngIf="isEventTask(i)" class="form-group">
+                    <label [for]="'task-event-date-' + i">Event Date</label>
+                    <input 
+                      type="datetime-local" 
+                      [id]="'task-event-date-' + i"
+                      formControlName="eventDate">
+                  </div>
+
+                  <!-- Resource URL for Resource Tasks -->
+                  <div *ngIf="isResourceTask(i)" class="form-group">
+                    <label [for]="'task-resource-url-' + i">Training Resource URL</label>
+                    <input 
+                      type="url" 
+                      [id]="'task-resource-url-' + i"
+                      formControlName="resourceUrl" 
+                      placeholder="https://example.com/resource">
+                  </div>
+
+                  <!-- Signature Requirement -->
+                  <div class="form-group checkbox-group">
+                    <label>
+                      <input 
+                        type="checkbox" 
+                        formControlName="requiresSignature">
+                      <span class="checkmark"></span>
+                      Requires Digital Signature
+                    </label>
+                  </div>
+
+                  <!-- Document Upload Section -->
+                  <div *ngIf="isDocumentTask(i)" class="document-upload">
+                    <h5>Document Upload</h5>
+                    <div class="file-upload-container">
+                      <input 
+                        type="file" 
+                        [id]="'file-' + i" 
+                        (change)="onFileSelected($event, i)" 
+                        style="display: none;" 
+                        accept=".pdf,.doc,.docx,.txt">
+                      <button type="button" class="btn btn-outline btn-sm" (click)="triggerFileInput(i)">
+                        <i class="bi bi-paperclip"></i> Choose File
+                      </button>
+                      <span *ngIf="selectedFiles[i]" class="file-name">
+                        {{ selectedFiles[i].name }}
+                      </span>
+                      <button 
+                        type="button" 
+                        class="btn btn-primary btn-sm" 
+                        (click)="uploadDocument(i)" 
+                        [disabled]="!selectedFiles[i]">
+                        <i class="bi bi-upload"></i> Upload
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Form Actions -->
+          <div class="form-actions">
+            <button type="button" class="btn-secondary" (click)="cancel()" [disabled]="loading">
+              <i class="bi bi-x-circle"></i> Cancel
+            </button>
+            <button type="submit" class="btn-primary" [disabled]="loading || templateForm.invalid">
+              <i class="bi bi-check-circle" *ngIf="!loading"></i>
+              <i class="bi bi-arrow-clockwise spin" *ngIf="loading"></i>
+              {{ loading ? 'Creating...' : 'Create Template' }}
+            </button>
+          </div>
+        </form>
+      </div>
+    </section>
+  </main>
+</div>

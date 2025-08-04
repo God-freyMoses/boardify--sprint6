@@ -1,0 +1,170 @@
+<div class="dashboard-container">
+  <!-- Sidebar -->
+  <div class="sidebar">
+    <div class="logo">
+      <h2>Boardify</h2>
+    </div>
+    <nav>
+      <ul>
+        <li (click)="navigateToDashboard()" style="cursor: pointer;">
+          <i class="bi bi-speedometer2"></i> Dashboard
+        </li>
+        <li class="active" (click)="navigateToTemplates()" style="cursor: pointer;">
+          <i class="bi bi-layout-text-window-reverse"></i> Templates
+        </li>
+      </ul>
+    </nav>
+  </div>
+
+  <!-- Main Content -->
+  <div class="main-content">
+    <!-- Header -->
+    <div class="header">
+      <div class="header-left">
+        <h1>Assign Template</h1>
+        <p>Assign onboarding template to employee</p>
+      </div>
+      <div class="header-right" *ngIf="user$ | async as user">
+        <div class="user-info">
+          <span>{{ user.firstName }} {{ user.lastName }}</span>
+          <div class="user-avatar">{{ user.firstName?.charAt(0) }}{{ user.lastName?.charAt(0) }}</div>
+        </div>
+        <button class="logout-btn" (click)="logout()">
+          <i class="bi bi-box-arrow-right"></i>
+        </button>
+      </div>
+    </div>
+
+    <!-- Error Message -->
+    <div *ngIf="errorMessage" class="error-message">
+      <i class="bi bi-exclamation-triangle"></i>
+      {{ errorMessage }}
+    </div>
+
+    <!-- Success Message -->
+    <div *ngIf="successMessage" class="success-message">
+      <i class="bi bi-check-circle"></i>
+      {{ successMessage }}
+    </div>
+
+    <!-- Assignment Form -->
+    <div class="form-container">
+      <!-- Template Info -->
+      <div *ngIf="template" class="template-info">
+        <h3>Template Details</h3>
+        <div class="template-card">
+          <div class="template-header">
+            <h4>{{ template.title }}</h4>
+            <span class="status-badge" [class]="'status-' + template.status?.toLowerCase()">{{ template.status }}</span>
+          </div>
+          <p class="template-description">{{ template.description }}</p>
+          <div class="template-stats">
+            <div class="stat">
+              <i class="bi bi-list-task"></i>
+              <span>{{ template.tasks?.length || 0 }} Tasks</span>
+            </div>
+            <div class="stat">
+              <i class="bi bi-clock"></i>
+              <span>{{ getTotalHours() }} Hours</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Assignment Form -->
+      <form [formGroup]="assignForm" (ngSubmit)="onSubmit()" class="assignment-form">
+        <h3>Assignment Details</h3>
+        
+        <!-- Department Filter -->
+        <div class="form-group">
+          <label for="departmentId">Filter by Department (Optional)</label>
+          <select id="departmentId" formControlName="departmentId" (change)="onDepartmentChange()">
+            <option value="">All Departments</option>
+            <option *ngFor="let department of departments" [value]="department.id">
+              {{ department.name }}
+            </option>
+          </select>
+        </div>
+
+        <!-- Employee Selection -->
+        <div class="form-group">
+          <label for="employeeId">Select Employee *</label>
+          <select 
+            id="employeeId" 
+            formControlName="employeeId"
+            [class.error]="assignForm.get('employeeId')?.invalid && assignForm.get('employeeId')?.touched">
+            <option value="">Choose an employee...</option>
+            <option *ngFor="let employee of employees" [value]="employee.id">
+              {{ employee.firstName }} {{ employee.lastName }} - {{ employee.email }}
+            </option>
+          </select>
+          <div *ngIf="assignForm.get('employeeId')?.invalid && assignForm.get('employeeId')?.touched" class="error-text">
+            <span *ngIf="assignForm.get('employeeId')?.errors?.['required']">Please select an employee</span>
+          </div>
+        </div>
+
+        <!-- Selected Employee Info -->
+        <div *ngIf="getSelectedEmployee()" class="employee-info">
+          <h4>Selected Employee</h4>
+          <div class="employee-card">
+            <div class="employee-avatar">
+              {{ getSelectedEmployee()?.firstName?.charAt(0) }}{{ getSelectedEmployee()?.lastName?.charAt(0) }}
+            </div>
+            <div class="employee-details">
+              <h5>{{ getSelectedEmployee()?.firstName }} {{ getSelectedEmployee()?.lastName }}</h5>
+              <p>{{ getSelectedEmployee()?.email }}</p>
+              <p *ngIf="getSelectedEmployee()?.department">{{ getSelectedEmployee()?.department?.name }}</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Due Date -->
+        <div class="form-group">
+          <label for="dueDate">Due Date *</label>
+          <input 
+            type="date" 
+            id="dueDate" 
+            formControlName="dueDate"
+            [min]="getTomorrowDate()"
+            [class.error]="assignForm.get('dueDate')?.invalid && assignForm.get('dueDate')?.touched">
+          <div *ngIf="assignForm.get('dueDate')?.invalid && assignForm.get('dueDate')?.touched" class="error-text">
+            <span *ngIf="assignForm.get('dueDate')?.errors?.['required']">Due date is required</span>
+          </div>
+        </div>
+
+        <!-- Priority -->
+        <div class="form-group">
+          <label for="priority">Priority *</label>
+          <select id="priority" formControlName="priority">
+            <option value="LOW">Low</option>
+            <option value="MEDIUM">Medium</option>
+            <option value="HIGH">High</option>
+            <option value="CRITICAL">Critical</option>
+          </select>
+        </div>
+
+        <!-- Notes -->
+        <div class="form-group">
+          <label for="notes">Additional Notes (Optional)</label>
+          <textarea 
+            id="notes" 
+            formControlName="notes" 
+            placeholder="Add any special instructions or notes for the employee..."
+            rows="4"></textarea>
+        </div>
+
+        <!-- Form Actions -->
+        <div class="form-actions">
+          <button type="button" class="btn btn-secondary" (click)="cancel()" [disabled]="isLoading">
+            <i class="bi bi-x"></i> Cancel
+          </button>
+          <button type="submit" class="btn btn-primary" [disabled]="assignForm.invalid || isLoading">
+            <i class="bi bi-person-plus" *ngIf="!isLoading"></i>
+            <i class="bi bi-arrow-clockwise spin" *ngIf="isLoading"></i>
+            {{ isLoading ? 'Assigning...' : 'Assign Template' }}
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

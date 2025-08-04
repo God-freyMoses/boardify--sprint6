@@ -1,0 +1,235 @@
+### Onboarding Template API Documentation
+
+### Template Management
+
+# Create a new template
+POST http://localhost:8080/api/templates
+Content-Type: application/json
+
+{
+  "title": "Software Developer Onboarding",
+  "description": "Complete onboarding process for new software developers",
+  "hrId": "550e8400-e29b-41d4-a716-446655440000",
+  "departmentIds": [1, 2],
+  "taskIds": [1, 2, 3]
+}
+
+###
+
+# Get template by ID
+GET http://localhost:8080/api/templates/1
+
+###
+
+# Update template
+PUT http://localhost:8080/api/templates/1
+Content-Type: application/json
+
+{
+  "title": "Updated Software Developer Onboarding",
+  "description": "Updated complete onboarding process for new software developers",
+  "status": "IN_PROGRESS",
+  "departmentIds": [1, 2, 3]
+}
+
+###
+
+# Get templates by department
+GET http://localhost:8080/api/templates/department/1
+
+###
+
+# Get templates by HR user
+GET http://localhost:8080/api/templates/hr/550e8400-e29b-41d4-a716-446655440000
+
+###
+
+# Get templates by company
+GET http://localhost:8080/api/templates/company/1
+
+###
+
+# Assign template to hire
+POST http://localhost:8080/api/templates/1/assign/550e8400-e29b-41d4-a716-446655440001
+
+###
+
+# Delete template
+DELETE http://localhost:8080/api/templates/1
+
+###
+
+### Todo Management
+
+# Get todo by ID
+GET http://localhost:8080/api/todos/1
+
+###
+
+# Get todos by hire ID
+GET http://localhost:8080/api/todos/hire/550e8400-e29b-41d4-a716-446655440001
+
+###
+
+# Get todos by HR ID
+GET http://localhost:8080/api/todos/hr/550e8400-e29b-41d4-a716-446655440000
+
+###
+
+# Complete a todo
+PUT http://localhost:8080/api/todos/1/complete
+
+###
+
+# Send reminder for todo
+POST http://localhost:8080/api/todos/1/reminder
+
+###
+
+# Create todos from template
+POST http://localhost:8080/api/todos/template/1/hire/550e8400-e29b-41d4-a716-446655440001
+
+###
+
+# Get progress percentage for hire
+GET http://localhost:8080/api/todos/hire/550e8400-e29b-41d4-a716-446655440001/progress
+
+###
+
+# Get overdue todos
+GET http://localhost:8080/api/todos/overdue
+
+###
+
+### Task Management
+
+# Get all tasks
+GET http://localhost:8080/api/tasks
+
+###
+
+# Get task by ID
+GET http://localhost:8080/api/tasks/1
+
+###
+
+# Create new task
+POST http://localhost:8080/api/tasks
+Content-Type: application/json
+
+{
+  "title": "Upload ID Document",
+  "description": "Please upload a valid copy of your ID document",
+  "dueDate": "2025-07-28T23:59:59",
+  "requiresSignature": true
+}
+
+###
+
+# Update task
+PUT http://localhost:8080/api/tasks/1
+Content-Type: application/json
+
+{
+  "title": "Updated Upload ID Document",
+  "description": "Please upload a valid copy of your government-issued ID document",
+  "dueDate": "2025-07-30T23:59:59",
+  "status": "IN_PROGRESS",
+  "requiresSignature": true
+}
+
+###
+
+# Delete task
+DELETE http://localhost:8080/api/tasks/1
+
+###
+
+# Get tasks by template
+GET http://localhost:8080/api/tasks/template/1
+
+###
+
+# Get tasks by HR user
+GET http://localhost:8080/api/tasks/hr/550e8400-e29b-41d4-a716-446655440000
+
+###
+
+# Get tasks by status
+GET http://localhost:8080/api/tasks/status/PENDING
+
+###
+
+### Document Management
+
+# Upload document
+POST http://localhost:8080/api/documents/upload
+Content-Type: multipart/form-data
+
+# Note: Use form data with 'file' and 'taskId' parameters
+# file: [select file]
+# taskId: 1
+
+###
+
+# Get document by ID
+GET http://localhost:8080/api/documents/1
+
+###
+
+# Get documents by task
+GET http://localhost:8080/api/documents/task/1
+
+###
+
+# Get documents by template
+GET http://localhost:8080/api/documents/template/1
+
+###
+
+# Download document
+GET http://localhost:8080/api/documents/1/download
+
+###
+
+# Get document download URL
+GET http://localhost:8080/api/documents/1/url
+
+###
+
+# Delete document
+DELETE http://localhost:8080/api/documents/1
+
+###
+
+### Notification Management
+
+# Create notification
+POST http://localhost:8080/api/notifications?userId=550e8400-e29b-41d4-a716-446655440001&message=Your task is due soon&relatedTaskId=1
+
+###
+
+# Get notifications by user
+GET http://localhost:8080/api/notifications/user/550e8400-e29b-41d4-a716-446655440001
+
+###
+
+# Get unread notifications by user
+GET http://localhost:8080/api/notifications/user/550e8400-e29b-41d4-a716-446655440001/unread
+
+###
+
+# Mark notification as read
+PUT http://localhost:8080/api/notifications/1/read
+
+###
+
+# Mark all notifications as read for user
+PUT http://localhost:8080/api/notifications/user/550e8400-e29b-41d4-a716-446655440001/read-all
+
+###
+
+# Get unread notification count
+GET http://localhost:8080/api/notifications/user/550e8400-e29b-41d4-a716-446655440001/unread-count
+
+###

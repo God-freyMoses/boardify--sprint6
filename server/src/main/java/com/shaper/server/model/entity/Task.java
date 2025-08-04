@@ -34,8 +34,28 @@ public class Task {
     @Column(name = "status", nullable = false)
     private TaskStatus status;
     
+    @Enumerated(EnumType.STRING)
+    @Column(name = "task_type", nullable = false)
+    private TaskType taskType;
+    
     @Column(name = "requires_signature", nullable = false)
     private boolean requiresSignature;
+    
+    @Column(name = "resource_url")
+    private String resourceUrl;
+    
+    @Column(name = "event_date")
+    private LocalDateTime eventDate;
+    
+    @Column(name = "priority")
+    @Enumerated(EnumType.STRING)
+    private TaskPriority priority;
+    
+    @Column(name = "estimated_hours")
+    private Double estimatedHours;
+    
+    @Column(name = "order_index")
+    private Integer orderIndex;
 
     @OneToMany(mappedBy = "task", cascade = CascadeType.ALL)
     private Set<Document> documents;
@@ -59,5 +79,18 @@ public class Task {
         PENDING,
         IN_PROGRESS,
         COMPLETED
+    }
+    
+    public enum TaskType {
+        EVENT,
+        DOCUMENT,
+        RESOURCE
+    }
+    
+    public enum TaskPriority {
+        LOW,
+        MEDIUM,
+        HIGH,
+        CRITICAL
     }
 }
