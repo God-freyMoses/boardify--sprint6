@@ -6,6 +6,7 @@ import {USERDASHBOARD_ROUTES} from './userdashboard/userdashboard.routes';
 import {TASKPAGE_ROUTES} from './taskpage/taskpage.routes';
 import {USERDOCUMENTS_ROUTES} from './userdocuments/userdocuments.routes';
 import {OPENDOCUMENTS_ROUTES} from './opendocuments/opendocuments.routes';
+import {TEMPLATES_ROUTES} from './templates/templates.routes';
 
 import {PLAN_ROUTES} from './plan/plan.routes';
 import {PAYMENTPAGE_ROUTES} from './paymentpage/paymentpage.routes';
@@ -24,6 +25,7 @@ export const routes: Routes = [
   ...TASKPAGE_ROUTES,
   ...USERDOCUMENTS_ROUTES,
   ...OPENDOCUMENTS_ROUTES,
+  ...TEMPLATES_ROUTES,
 
   ...PLAN_ROUTES,
   ...PAYMENTPAGE_ROUTES,

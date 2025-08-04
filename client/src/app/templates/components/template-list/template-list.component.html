@@ -1,0 +1,121 @@
+<body>
+<div class="container">
+  <aside class="sidebar">
+    <div class="logo">Boardify</div>
+    <nav>
+      <ul>
+        <li (click)="navigateToDashboard()" style="cursor: pointer;"><i class="bi bi-speedometer2"></i> Dashboard</li>
+        <li (click)="navigateToNewHires()" style="cursor: pointer;"><i class="bi bi-people"></i> Employees</li>
+        <li class="active"><i class="bi bi-layout-text-window-reverse"></i> Templates</li>
+        <li><i class="bi bi-list-task"></i> Routine</li>
+      </ul>
+    </nav>
+    <div class="cta">
+      <p><i class="bi bi-plus-circle"></i> Create New Template?</p>
+      <button (click)="createTemplate()"><i class="bi bi-arrow-right-circle"></i> Create Template →</button>
+    </div>
+    <div class="bottom-links">
+      <p><i class="bi bi-gear"></i> Settings</p>
+      <p (click)="logout()" style="cursor: pointer; color: #dc3545;"><i class="bi bi-box-arrow-right"></i> Sign out</p>
+    </div>
+  </aside>
+  
+  <main class="main">
+    <header>
+      <h1>Onboarding Templates</h1>
+      <div class="header-actions">
+        <i class="bi bi-search"></i>
+        <i class="bi bi-bell"></i>
+        <div class="profile">
+          <span>{{ currentUser ? (currentUser.firstName + ' ' + currentUser.lastName) : 'HR Manager' }}</span>
+          <p>{{ currentUser?.role === 'HR_MANAGER' ? 'Lead HR' : 'HR Manager' }}</p>
+        </div>
+      </div>
+    </header>
+
+    <section class="filters">
+      <div class="filter-group">
+        <div class="search-box">
+          <i class="bi bi-search"></i>
+          <input 
+            type="text" 
+            placeholder="Search templates..." 
+            [(ngModel)]="searchTerm" 
+            (input)="onSearchChange()"
+          >
+        </div>
+        <div class="status-filter">
+          <select [(ngModel)]="selectedStatus" (change)="onStatusChange()">
+            <option value="ALL">All Status</option>
+            <option *ngFor="let status of templateStatuses" [value]="status">{{ status }}</option>
+          </select>
+        </div>
+        <button class="btn-primary" (click)="createTemplate()">
+          <i class="bi bi-plus"></i> New Template
+        </button>
+      </div>
+    </section>
+
+    <section class="content">
+      <div class="error-message" *ngIf="error">
+        <i class="bi bi-exclamation-triangle"></i>
+        {{ error }}
+      </div>
+
+      <div class="loading" *ngIf="loading">
+        <i class="bi bi-arrow-clockwise spin"></i>
+        Loading templates...
+      </div>
+
+      <div class="templates-grid" *ngIf="!loading && !error">
+        <div class="template-card" *ngFor="let template of filteredTemplates">
+          <div class="template-header">
+            <h3>{{ template.title }}</h3>
+            <span [class]="getStatusClass(template.status)">{{ template.status }}</span>
+          </div>
+          
+          <div class="template-body">
+            <p class="description">{{ template.description }}</p>
+            <div class="template-meta">
+              <div class="meta-item">
+                <i class="bi bi-person"></i>
+                <span>{{ template.hrName || 'Unknown HR' }}</span>
+              </div>
+              <div class="meta-item">
+                <i class="bi bi-calendar"></i>
+                <span>{{ formatDate(template.createdDate || '') }}</span>
+              </div>
+              <div class="meta-item">
+                <i class="bi bi-list-task"></i>
+                <span>{{ template.taskIds?.length || 0 }} tasks</span>
+              </div>
+            </div>
+          </div>
+          
+          <div class="template-actions">
+            <button class="btn-secondary" (click)="editTemplate(template.id!)">
+              <i class="bi bi-pencil"></i> Edit
+            </button>
+            <button class="btn-primary" (click)="assignTemplate(template.id!)">
+              <i class="bi bi-person-plus"></i> Assign
+            </button>
+            <button class="btn-danger" (click)="deleteTemplate(template.id!, template.title)">
+              <i class="bi bi-trash"></i> Delete
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="empty-state" *ngIf="!loading && !error && filteredTemplates.length === 0">
+        <i class="bi bi-file-earmark-text"></i>
+        <h3>No templates found</h3>
+        <p *ngIf="searchTerm || selectedStatus !== 'ALL'">Try adjusting your filters or search terms.</p>
+        <p *ngIf="!searchTerm && selectedStatus === 'ALL'">Create your first onboarding template to get started.</p>
+        <button class="btn-primary" (click)="createTemplate()">
+          <i class="bi bi-plus"></i> Create Template
+        </button>
+      </div>
+    </section>
+  </main>
+</div>
+</body>

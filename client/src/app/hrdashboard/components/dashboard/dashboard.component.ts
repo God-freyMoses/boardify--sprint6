@@ -64,6 +64,10 @@ export class DashboardComponent implements OnInit {
     this.router.navigate(['/dashboard/newhires']);
   }
 
+  navigateToTemplates() {
+    this.router.navigate(['/templates']);
+  }
+
   logout() {
     this.store.dispatch(AuthActions.LOGOUT());
     this.router.navigate(['/login']);

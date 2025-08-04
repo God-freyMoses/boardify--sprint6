@@ -1,0 +1,176 @@
+<body>
+<div class="container">
+  <aside class="sidebar">
+    <div class="logo">Boardify</div>
+    <nav>
+      <ul>
+        <li (click)="navigateToDashboard()" style="cursor: pointer;"><i class="bi bi-speedometer2"></i> Dashboard</li>
+        <li><i class="bi bi-people"></i> Employees</li>
+        <li (click)="navigateToTemplates()" style="cursor: pointer;"><i class="bi bi-layout-text-window-reverse"></i> Templates</li>
+        <li><i class="bi bi-list-task"></i> Routine</li>
+      </ul>
+    </nav>
+    <div class="cta">
+      <p><i class="bi bi-plus-circle"></i> Creating New Template</p>
+      <button (click)="navigateToTemplates()"><i class="bi bi-arrow-left-circle"></i> ← Back to Templates</button>
+    </div>
+    <div class="bottom-links">
+      <p><i class="bi bi-gear"></i> Settings</p>
+      <p (click)="logout()" style="cursor: pointer; color: #dc3545;"><i class="bi bi-box-arrow-right"></i> Sign out</p>
+    </div>
+  </aside>
+  
+  <main class="main">
+    <header>
+      <h1>Create New Onboarding Template</h1>
+      <div class="header-actions">
+        <i class="bi bi-search"></i>
+        <i class="bi bi-bell"></i>
+        <div class="profile">
+          <span>{{ currentUser ? (currentUser.firstName + ' ' + currentUser.lastName) : 'HR Manager' }}</span>
+          <p>{{ currentUser?.role === 'HR_MANAGER' ? 'Lead HR' : 'HR Manager' }}</p>
+        </div>
+      </div>
+    </header>
+
+    <section class="content">
+      <div class="form-container">
+        <div class="success-message" *ngIf="success">
+          <i class="bi bi-check-circle"></i>
+          {{ success }}
+        </div>
+
+        <div class="error-message" *ngIf="error">
+          <i class="bi bi-exclamation-triangle"></i>
+          {{ error }}
+        </div>
+
+        <form [formGroup]="templateForm" (ngSubmit)="onSubmit()" class="template-form">
+          <!-- Basic Information -->
+          <div class="form-section">
+            <h3><i class="bi bi-info-circle"></i> Basic Information</h3>
+            
+            <div class="form-group">
+              <label for="title">Template Title *</label>
+              <input 
+                type="text" 
+                id="title" 
+                formControlName="title"
+                placeholder="Enter template title"
+                [class.error]="isFieldInvalid('title')"
+              >
+              <div class="error-text" *ngIf="isFieldInvalid('title')">
+                {{ getFieldError('title') }}
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="description">Description *</label>
+              <textarea 
+                id="description" 
+                formControlName="description"
+                placeholder="Describe the purpose and scope of this onboarding template"
+                rows="4"
+                [class.error]="isFieldInvalid('description')"
+              ></textarea>
+              <div class="error-text" *ngIf="isFieldInvalid('description')">
+                {{ getFieldError('description') }}
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="status">Initial Status *</label>
+              <select id="status" formControlName="status">
+                <option *ngFor="let status of templateStatuses" [value]="status">
+                  {{ status }}
+                </option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Tasks Section -->
+          <div class="form-section">
+            <div class="section-header">
+              <h3><i class="bi bi-list-task"></i> Template Tasks</h3>
+              <button type="button" class="btn-secondary" (click)="addTask()">
+                <i class="bi bi-plus"></i> Add Task
+              </button>
+            </div>
+
+            <div class="tasks-container" formArrayName="tasks">
+              <div 
+                *ngFor="let task of tasks.controls; let i = index" 
+                [formGroupName]="i" 
+                class="task-item"
+              >
+                <div class="task-header">
+                  <h4>Task {{ i + 1 }}</h4>
+                  <button 
+                    type="button" 
+                    class="btn-danger-small" 
+                    (click)="removeTask(i)"
+                    [disabled]="tasks.length === 1"
+                  >
+                    <i class="bi bi-trash"></i>
+                  </button>
+                </div>
+
+                <div class="task-fields">
+                  <div class="form-group">
+                    <label [for]="'task-title-' + i">Task Title *</label>
+                    <input 
+                      type="text" 
+                      [id]="'task-title-' + i"
+                      formControlName="title"
+                      placeholder="Enter task title"
+                      [class.error]="isTaskFieldInvalid(i, 'title')"
+                    >
+                    <div class="error-text" *ngIf="isTaskFieldInvalid(i, 'title')">
+                      {{ getTaskFieldError(i, 'title') }}
+                    </div>
+                  </div>
+
+                  <div class="form-group">
+                    <label [for]="'task-description-' + i">Task Description *</label>
+                    <textarea 
+                      [id]="'task-description-' + i"
+                      formControlName="description"
+                      placeholder="Describe what needs to be done"
+                      rows="3"
+                      [class.error]="isTaskFieldInvalid(i, 'description')"
+                    ></textarea>
+                    <div class="error-text" *ngIf="isTaskFieldInvalid(i, 'description')">
+                      {{ getTaskFieldError(i, 'description') }}
+                    </div>
+                  </div>
+
+                  <div class="form-group">
+                    <label [for]="'task-due-date-' + i">Due Date (Optional)</label>
+                    <input 
+                      type="date" 
+                      [id]="'task-due-date-' + i"
+                      formControlName="dueDate"
+                    >
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Form Actions -->
+          <div class="form-actions">
+            <button type="button" class="btn-secondary" (click)="cancel()" [disabled]="loading">
+              <i class="bi bi-x-circle"></i> Cancel
+            </button>
+            <button type="submit" class="btn-primary" [disabled]="loading || templateForm.invalid">
+              <i class="bi bi-check-circle" *ngIf="!loading"></i>
+              <i class="bi bi-arrow-clockwise spin" *ngIf="loading"></i>
+              {{ loading ? 'Creating...' : 'Create Template' }}
+            </button>
+          </div>
+        </form>
+      </div>
+    </section>
+  </main>
+</div>
+</body>
