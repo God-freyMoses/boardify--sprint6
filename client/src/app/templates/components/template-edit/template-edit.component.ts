@@ -31,6 +31,14 @@ export class TemplateEditComponent implements OnInit {
   // File upload properties
   selectedFiles: { [taskIndex: number]: File } = {};
 
+  // Method to trigger file input click
+  triggerFileInput(taskIndex: number): void {
+    const fileInput = document.getElementById('file-' + taskIndex) as HTMLInputElement;
+    if (fileInput) {
+      fileInput.click();
+    }
+  }
+
   constructor(
     private fb: FormBuilder,
     private templateService: TemplateService,

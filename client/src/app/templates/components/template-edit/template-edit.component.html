@@ -221,7 +221,7 @@
                     <button 
                       type="button" 
                       class="btn btn-outline" 
-                      (click)="document.getElementById('file-' + i)?.click()">
+                      (click)="triggerFileInput(i)">
                       <i class="bi bi-paperclip"></i> Choose File
                     </button>
                     <span *ngIf="selectedFiles[i]" class="file-name">
