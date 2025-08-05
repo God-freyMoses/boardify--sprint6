@@ -1,0 +1,7 @@
+{
+  "title": "Test Task",
+  "description": "A test task for document upload",
+  "taskType": "DOCUMENT",
+  "priority": "MEDIUM",
+  "requiresSignature": false
+}

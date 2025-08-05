@@ -24,7 +24,9 @@ public interface UserService {
 
     List<Map<String, Object>> getAllHires();
 
+    // GET HR USER BY COMPANY ID
 
+    Map<String, Object> getHrUserByCompanyId(Integer companyId);
 
 
 }

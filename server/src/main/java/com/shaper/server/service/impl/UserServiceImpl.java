@@ -206,4 +206,27 @@ public class UserServiceImpl implements UserService {
             .collect(Collectors.toList());
     }
 
+    @Override
+    public Map<String, Object> getHrUserByCompanyId(Integer companyId) {
+        HrUser hrUser = hrUserRepository.findByCompanyId(companyId);
+        if (hrUser == null) {
+            throw new RuntimeException("No HR user found for company ID: " + companyId);
+        }
+        
+        Map<String, Object> hrUserMap = new HashMap<>();
+        hrUserMap.put("id", hrUser.getId());
+        hrUserMap.put("firstName", hrUser.getFirstName());
+        hrUserMap.put("lastName", hrUser.getLastName());
+        hrUserMap.put("email", hrUser.getEmail());
+        hrUserMap.put("role", hrUser.getRole());
+        
+        // Company info
+        if (hrUser.getCompany() != null) {
+            hrUserMap.put("companyId", hrUser.getCompany().getId());
+            hrUserMap.put("companyName", hrUser.getCompany().getName());
+        }
+        
+        return hrUserMap;
+    }
+
 }

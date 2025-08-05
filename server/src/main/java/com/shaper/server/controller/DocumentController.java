@@ -27,17 +27,28 @@ public class DocumentController {
             @RequestParam("file") MultipartFile file,
             @RequestParam(value = "taskId", required = false) Integer taskId,
             @RequestParam(value = "templateId", required = false) Integer templateId) {
+        System.out.println("=== DOCUMENT CONTROLLER UPLOAD ENDPOINT CALLED ===");
+        System.out.println("File: " + (file != null ? file.getOriginalFilename() : "null"));
+        System.out.println("TaskId: " + taskId);
+        System.out.println("TemplateId: " + templateId);
+        
         try {
             DocumentDto uploadedDocument;
             if (taskId != null) {
+                System.out.println("Uploading to task: " + taskId);
                 uploadedDocument = documentService.uploadDocument(file, taskId);
             } else if (templateId != null) {
+                System.out.println("Uploading to template: " + templateId);
                 uploadedDocument = documentService.uploadDocumentToTemplate(file, templateId);
             } else {
+                System.out.println("ERROR: Neither taskId nor templateId provided");
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
             }
+            System.out.println("Upload successful, returning document: " + uploadedDocument.getName());
             return ResponseEntity.status(HttpStatus.CREATED).body(uploadedDocument);
         } catch (Exception e) {
+            System.out.println("ERROR in DocumentController: " + e.getMessage());
+            e.printStackTrace();
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         }
     }

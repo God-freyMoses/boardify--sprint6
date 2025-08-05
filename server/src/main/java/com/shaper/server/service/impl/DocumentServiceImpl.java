@@ -34,12 +34,23 @@ public class DocumentServiceImpl implements DocumentService {
     @Override
     @Transactional
     public DocumentDto uploadDocument(MultipartFile file, Integer taskId) {
+        System.out.println("=== DOCUMENT UPLOAD START ===");
+        System.out.println("File name: " + file.getOriginalFilename());
+        System.out.println("File size: " + file.getSize());
+        System.out.println("Task ID: " + taskId);
+        
         if (file.isEmpty()) {
+            System.out.println("ERROR: File is empty");
             throw new RuntimeException("File is empty");
         }
         
         Task task = taskRepository.findById(taskId)
-            .orElseThrow(() -> new RuntimeException("Task not found"));
+            .orElseThrow(() -> {
+                System.out.println("ERROR: Task not found with ID: " + taskId);
+                return new RuntimeException("Task not found");
+            });
+        
+        System.out.println("Task found: " + task.getTitle());
         
         try {
             // Create upload directory if it doesn't exist
@@ -65,9 +76,17 @@ public class DocumentServiceImpl implements DocumentService {
             document.setName(originalFilename != null ? originalFilename : uniqueFilename);
             document.setFilePath(filePath.toString());
             document.setTask(task);
-            document.setRequiresSignature(task.isRequiresSignature());
+            document.setRequiresSignature(false); // Default value
             
+            System.out.println("Saving document to database...");
+            System.out.println("Document name: " + document.getName());
+            System.out.println("Document path: " + document.getFilePath());
+            
+            // Save document to database
             Document savedDocument = documentRepository.save(document);
+            
+            System.out.println("Document saved successfully with ID: " + savedDocument.getId());
+            System.out.println("=== DOCUMENT UPLOAD END ===");
             return convertToDto(savedDocument, file.getSize(), file.getContentType());
             
         } catch (IOException e) {

@@ -7,7 +7,7 @@ import { Template, TemplateStatus, TemplateStatusEnum, TaskType, TaskPriority, T
 import { Store } from '@ngrx/store';
 import { selectUser } from '../../../auth/store/auth.selectors';
 import { UserType } from '../../../auth/model/auth.model';
-import { Observable } from 'rxjs';
+import { Observable, firstValueFrom } from 'rxjs';
 
 @Component({
   selector: 'app-template-create',
@@ -78,7 +78,8 @@ export class TemplateCreateComponent implements OnInit {
       priority: [TaskPriorityEnum.MEDIUM, Validators.required],
       eventDate: [''],
       requiresSignature: [false],
-      resourceUrl: ['']
+      resourceUrl: [''],
+      documentFile: [null]
     });
   }
 
@@ -105,12 +106,26 @@ export class TemplateCreateComponent implements OnInit {
   uploadDocument(taskIndex: number): void {
     const file = this.selectedFiles[taskIndex];
     if (file) {
-      // For now, just store the file name as resourceUrl
-      const taskGroup = this.tasks.at(taskIndex) as FormGroup;
-      taskGroup.patchValue({ resourceUrl: file.name });
+      this.loading = true;
+      this.error = '';
       
-      // In a real application, you would upload the file to a server
-      console.log('File uploaded:', file.name);
+      // Since we're creating a new template, we need to upload to template first
+      // For now, we'll store the file and upload it after template creation
+      const taskGroup = this.tasks.at(taskIndex) as FormGroup;
+      taskGroup.patchValue({ 
+        resourceUrl: file.name,
+        documentFile: file // Store the file object for later upload
+      });
+      
+      this.loading = false;
+      this.success = `File "${file.name}" prepared for upload. It will be uploaded when the template is saved.`;
+      
+      // Clear the success message after 3 seconds
+      setTimeout(() => {
+        this.success = '';
+      }, 3000);
+      
+      console.log('File prepared for upload:', file.name);
     }
   }
 
@@ -134,9 +149,21 @@ export class TemplateCreateComponent implements OnInit {
     if (this.templateForm.valid && this.currentUser) {
       this.loading = true;
       this.error = '';
+      this.success = '';
+      
+      const formValue = this.templateForm.value;
       
       const templateData: Template = {
-        ...this.templateForm.value,
+        title: formValue.title,
+        description: formValue.description,
+        status: formValue.status,
+        tasks: formValue.tasks.map((task: any) => {
+          const { documentFile, ...taskWithoutFile } = task;
+          return {
+            ...taskWithoutFile,
+            orderIndex: formValue.tasks.indexOf(task)
+          };
+        }),
         hrId: this.currentUser.id,
         createdAt: new Date(),
         updatedAt: new Date()
@@ -144,11 +171,28 @@ export class TemplateCreateComponent implements OnInit {
 
       this.templateService.createTemplate(templateData).subscribe({
         next: (response) => {
-          this.loading = false;
+          console.log('Template created successfully:', response);
           this.success = 'Template created successfully!';
-          setTimeout(() => {
-            this.router.navigate(['/templates']);
-          }, 2000);
+          
+          // Upload documents for tasks that have files
+          this.uploadTaskDocuments(response, formValue.tasks).then(() => {
+            this.loading = false;
+            this.success = 'Template and documents uploaded successfully!';
+            
+            // Navigate to templates list after a short delay
+            setTimeout(() => {
+              this.router.navigate(['/templates']);
+            }, 2000);
+          }).catch((error) => {
+            console.error('Error uploading documents:', error);
+            this.loading = false;
+            this.success = 'Template created, but some documents failed to upload.';
+            
+            // Still navigate after delay
+            setTimeout(() => {
+              this.router.navigate(['/templates']);
+            }, 3000);
+          });
         },
         error: (error) => {
           this.loading = false;
@@ -220,5 +264,32 @@ export class TemplateCreateComponent implements OnInit {
 
   navigateToTemplates(): void {
     this.router.navigate(['/templates']);
+  }
+
+  private async uploadTaskDocuments(template: Template, formTasks: any[]): Promise<void> {
+    const uploadPromises: Promise<any>[] = [];
+    
+    formTasks.forEach((formTask, index) => {
+      if (formTask.documentFile && template.tasks && template.tasks[index]) {
+        const taskId = template.tasks[index].id;
+        if (taskId) {
+          const uploadPromise = firstValueFrom(this.templateService.uploadDocumentToTask(taskId, formTask.documentFile))
+            .then((document) => {
+              console.log(`Document uploaded for task ${taskId}:`, document);
+              return document;
+            })
+            .catch((error) => {
+              console.error(`Failed to upload document for task ${taskId}:`, error);
+              throw error;
+            });
+          
+          uploadPromises.push(uploadPromise);
+        }
+      }
+    });
+    
+    if (uploadPromises.length > 0) {
+      await Promise.all(uploadPromises);
+    }
   }
 }

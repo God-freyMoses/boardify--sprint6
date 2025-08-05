@@ -82,6 +82,19 @@ public class UserController {
         }
     }
 
+    // GET HR USER BY COMPANY ID
+    @GetMapping("/hr/company/{companyId}")
+    public ResponseEntity<Result> getHrUserByCompanyId(@PathVariable Integer companyId) {
+        try {
+            Map<String, Object> hrUser = userService.getHrUserByCompanyId(companyId);
+            Result result = new Result(200, true, "HR User retrieved successfully!", hrUser);
+            return ResponseEntity.ok(result);
+        } catch (Exception e) {
+            Result result = new Result(500, false, "Error retrieving HR user: " + e.getMessage());
+            return ResponseEntity.status(500).body(result);
+        }
+    }
+
     // LOGIN USER
 
     @PostMapping("/login")
