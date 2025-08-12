@@ -16,7 +16,7 @@ public interface TemplateRepository extends JpaRepository<Template, Integer> {
     
     List<Template> findByCreatedByHr_Id(java.util.UUID hrId);
     
-    List<Template> findByStatus(Template.TemplateStatus status);
+    List<Template> findByStatus(com.shaper.server.model.enums.TemplateStatus status);
     
     @Query("SELECT t FROM Template t JOIN t.departments d WHERE d.company.id = :companyId")
     List<Template> findByCompanyId(@Param("companyId") Integer companyId);

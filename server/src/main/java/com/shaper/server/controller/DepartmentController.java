@@ -64,7 +64,8 @@ public class DepartmentController {
                     .orElseThrow(() -> new RuntimeException("Company not found"));
             
             // Find HR user for this company
-            HrUser hrUser = hrUserRepository.findByCompanyId(companyId);
+            List<HrUser> hrUsers = hrUserRepository.findByCompany_Id(companyId);
+            HrUser hrUser = hrUsers.isEmpty() ? null : hrUsers.get(0);
             if (hrUser == null) {
                 throw new RuntimeException("No HR user found for company");
             }

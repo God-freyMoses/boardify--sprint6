@@ -25,21 +25,20 @@ public class Progress {
     private Hire hire;
     
     @ManyToOne
-    @JoinColumn(name = "task_id", nullable = false)
-    private Task task;
+    @JoinColumn(name = "template_id", nullable = false)
+    private Template template;
     
-    @Enumerated(EnumType.STRING)
-    @Column(name = "status", nullable = false)
-    private Task.TaskStatus status;
+    @Column(name = "total_tasks", nullable = false)
+    private Integer totalTasks;
     
-    @Column(name = "completed_at")
-    private LocalDateTime completedAt;
+    @Column(name = "completed_tasks", nullable = false)
+    private Integer completedTasks;
     
-    @Column(name = "signed_at")
-    private LocalDateTime signedAt;
+    @Column(name = "completion_percentage", nullable = false)
+    private Double completionPercentage;
     
-    @Column(name = "signature_data")
-    private String signatureData;
+    @Column(name = "last_updated", nullable = false)
+    private LocalDateTime lastUpdated;
     
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
@@ -47,6 +46,19 @@ public class Progress {
     @PrePersist
     protected void onCreate() {
         createdAt = LocalDateTime.now();
-        status = Task.TaskStatus.PENDING;
+        lastUpdated = LocalDateTime.now();
+        if (completedTasks == null) completedTasks = 0;
+        if (totalTasks == null) totalTasks = 0;
+        if (completionPercentage == null) completionPercentage = 0.0;
+    }
+    
+    @PreUpdate
+    protected void onUpdate() {
+        lastUpdated = LocalDateTime.now();
+        if (totalTasks > 0) {
+            completionPercentage = (completedTasks.doubleValue() / totalTasks.doubleValue()) * 100.0;
+        } else {
+            completionPercentage = 0.0;
+        }
     }
 }

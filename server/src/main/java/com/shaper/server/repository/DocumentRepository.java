@@ -13,5 +13,5 @@ public interface DocumentRepository extends JpaRepository<Document, Integer> {
     
     List<Document> findByRequiresSignature(boolean requiresSignature);
     
-    List<Document> findByTask_Templates_Id(Integer templateId);
+    List<Document> findByTask_Template_Id(Integer templateId);
 }

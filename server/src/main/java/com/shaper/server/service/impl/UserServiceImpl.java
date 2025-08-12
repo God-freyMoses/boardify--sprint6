@@ -1,5 +1,6 @@
 package com.shaper.server.service.impl;
 
+import com.shaper.server.CustomUserDetails;
 import com.shaper.server.exception.DataNotFoundException;
 import com.shaper.server.exception.UnAutororizedException;
 import com.shaper.server.mapper.UserMapper;
@@ -100,6 +101,33 @@ public class UserServiceImpl implements UserService {
         return UserMapper.userToUserTokenDTO(user, token);
     }
 
+    @Override
+    public UserTokenDTO refreshToken(String refreshToken) {
+        try {
+            // Extract username from refresh token
+            String username = jwtService.extractUserName(refreshToken);
+            
+            // Find user
+            User user = userRepository.findByEmail(username);
+            if (user == null) {
+                throw new DataNotFoundException("User not found");
+            }
+
+            // Validate refresh token
+            CustomUserDetails userDetails = new CustomUserDetails(user);
+            if (!jwtService.isTokenValid(refreshToken, userDetails)) {
+                throw new UnAutororizedException("Invalid refresh token");
+            }
+
+            // Generate new access token
+            String newToken = jwtService.generateToken(user);
+            
+            return UserMapper.userToUserTokenDTO(user, newToken);
+        } catch (Exception e) {
+            throw new UnAutororizedException("Invalid refresh token");
+        }
+    }
+
     private HrUser createHrUser(RegisterRequestDTO registerRequestDTO) {
         HrUser hrUser = new HrUser();
         hrUser.setEmail(registerRequestDTO.getEmail());
@@ -132,10 +160,11 @@ public class UserServiceImpl implements UserService {
     }
 
     private Hire createHire(RegisterRequestDTO registerRequestDTO) {
-        // Find the department by name instead of ID
-        CompanyDepartment department = companyDepartmentRepository.findByName(registerRequestDTO.getDepartmentId());
+        // Find the department by ID
+        CompanyDepartment department = companyDepartmentRepository.findById(Integer.valueOf(registerRequestDTO.getDepartmentId()))
+                .orElse(null);
         if (department == null) {
-            throw new RuntimeException("Department not found with name: " + registerRequestDTO.getDepartmentId());
+            throw new RuntimeException("Department not found with ID: " + registerRequestDTO.getDepartmentId());
         }
 
         // Generate a random password for the hire
@@ -153,7 +182,8 @@ public class UserServiceImpl implements UserService {
         hire.setDepartment(department);
         
         // Find an HR user from the same company to associate with
-        HrUser hrUser = hrUserRepository.findByCompanyId(department.getCompany().getId());
+        List<HrUser> hrUsers = hrUserRepository.findByCompany_Id(department.getCompany().getId());
+        HrUser hrUser = hrUsers.isEmpty() ? null : hrUsers.get(0);
         if (hrUser == null) {
             throw new RuntimeException("No HR user found for company: " + department.getCompany().getName());
         }
@@ -208,7 +238,8 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public Map<String, Object> getHrUserByCompanyId(Integer companyId) {
-        HrUser hrUser = hrUserRepository.findByCompanyId(companyId);
+        List<HrUser> hrUsers = hrUserRepository.findByCompany_Id(companyId);
+        HrUser hrUser = hrUsers.isEmpty() ? null : hrUsers.get(0);
         if (hrUser == null) {
             throw new RuntimeException("No HR user found for company ID: " + companyId);
         }

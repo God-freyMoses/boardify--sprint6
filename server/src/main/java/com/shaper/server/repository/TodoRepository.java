@@ -15,7 +15,7 @@ public interface TodoRepository extends JpaRepository<Todo, Integer> {
     
     List<Todo> findByHire_IdOrderByCreatedAtAsc(UUID hireId);
     
-    List<Todo> findByHire_IdAndStatusOrderByDueDateAsc(UUID hireId, Todo.TodoStatus status);
+    List<Todo> findByHire_IdAndStatusOrderByDueDateAsc(UUID hireId, com.shaper.server.model.enums.TodoStatus status);
     
     List<Todo> findByTemplate_Id(Integer templateId);
     
@@ -25,13 +25,13 @@ public interface TodoRepository extends JpaRepository<Todo, Integer> {
     List<Todo> findByHireIdAndTemplateId(@Param("hireId") UUID hireId, @Param("templateId") Integer templateId);
     
     @Query("SELECT COUNT(t) FROM Todo t WHERE t.hire.id = :hireId AND t.status = :status")
-    long countByHireIdAndStatus(@Param("hireId") UUID hireId, @Param("status") Todo.TodoStatus status);
+    long countByHireIdAndStatus(@Param("hireId") UUID hireId, @Param("status") com.shaper.server.model.enums.TodoStatus status);
     
     @Query("SELECT COUNT(t) FROM Todo t WHERE t.hire.id = :hireId")
     long countByHireId(@Param("hireId") UUID hireId);
     
     @Query("SELECT t FROM Todo t WHERE t.status = :status AND t.dueDate < :currentDate")
-    List<Todo> findOverdueTodos(@Param("status") Todo.TodoStatus status, @Param("currentDate") LocalDateTime currentDate);
+    List<Todo> findOverdueTodos(@Param("status") com.shaper.server.model.enums.TodoStatus status, @Param("currentDate") LocalDateTime currentDate);
     
     @Query("SELECT t FROM Todo t WHERE t.hire.registeredByHr.id = :hrId ORDER BY t.createdAt DESC")
     List<Todo> findByHrId(@Param("hrId") UUID hrId);

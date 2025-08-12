@@ -32,11 +32,11 @@ public class Task {
 
     @Enumerated(EnumType.STRING)
     @Column(name = "status", nullable = false)
-    private TaskStatus status;
+    private com.shaper.server.model.enums.TaskStatus status;
     
     @Enumerated(EnumType.STRING)
     @Column(name = "task_type", nullable = false)
-    private TaskType taskType;
+    private com.shaper.server.model.enums.TaskType taskType;
     
     @Column(name = "requires_signature", nullable = false)
     private boolean requiresSignature;
@@ -49,7 +49,7 @@ public class Task {
     
     @Column(name = "priority")
     @Enumerated(EnumType.STRING)
-    private TaskPriority priority;
+    private com.shaper.server.model.enums.TaskPriority priority;
     
     @Column(name = "estimated_hours")
     private Double estimatedHours;
@@ -57,14 +57,12 @@ public class Task {
     @Column(name = "order_index")
     private Integer orderIndex;
 
+    @ManyToOne
+    @JoinColumn(name = "template_id", nullable = false)
+    private Template template;
+    
     @OneToMany(mappedBy = "task", cascade = CascadeType.ALL)
     private Set<Document> documents;
-    
-    @ManyToMany(mappedBy = "tasks")
-    private Set<Template> templates;
-    
-    @OneToMany(mappedBy = "task")
-    private Set<Progress> progressItems;
 
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
@@ -72,25 +70,8 @@ public class Task {
     @PrePersist
     protected void onCreate() {
         createdAt = LocalDateTime.now();
-        status = TaskStatus.PENDING;
+        status = com.shaper.server.model.enums.TaskStatus.PENDING;
     }
 
-    public enum TaskStatus {
-        PENDING,
-        IN_PROGRESS,
-        COMPLETED
-    }
-    
-    public enum TaskType {
-        EVENT,
-        DOCUMENT,
-        RESOURCE
-    }
-    
-    public enum TaskPriority {
-        LOW,
-        MEDIUM,
-        HIGH,
-        CRITICAL
-    }
+
 }

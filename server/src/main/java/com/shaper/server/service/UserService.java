@@ -10,23 +10,18 @@ import java.util.Map;
 
 public interface UserService {
 
-
-
     // REGISTER
-
     UserDTO register(RegisterRequestDTO registerRequestDTO);
 
     // LOGIN
-
     UserTokenDTO login(LoginRequestDTO loginRequestDTO);
 
-    // GET ALL HIRES
+    // REFRESH TOKEN
+    UserTokenDTO refreshToken(String refreshToken);
 
+    // GET ALL HIRES
     List<Map<String, Object>> getAllHires();
 
     // GET HR USER BY COMPANY ID
-
     Map<String, Object> getHrUserByCompanyId(Integer companyId);
-
-
 }

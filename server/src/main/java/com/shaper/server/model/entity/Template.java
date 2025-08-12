@@ -29,18 +29,14 @@ public class Template {
 
     @Enumerated(EnumType.STRING)
     @Column(name = "status", nullable = false)
-    private TemplateStatus status;
+    private com.shaper.server.model.enums.TemplateStatus status;
     
     @ManyToOne
     @JoinColumn(name = "hr_id", nullable = false)
     private HrUser createdByHr;
     
-    @ManyToMany
-    @JoinTable(
-        name = "template_tasks",
-        joinColumns = @JoinColumn(name = "template_id"),
-        inverseJoinColumns = @JoinColumn(name = "task_id")
-    )
+    @OneToMany(mappedBy = "template", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OrderBy("orderIndex ASC")
     private Set<Task> tasks;
     
     @ManyToMany(mappedBy = "assignedTemplates")
@@ -56,7 +52,7 @@ public class Template {
     protected void onCreate() {
         createdDate = LocalDateTime.now();
         updatedDate = LocalDateTime.now();
-        status = TemplateStatus.PENDING;
+        status = com.shaper.server.model.enums.TemplateStatus.PENDING;
     }
     
     @PreUpdate
@@ -64,9 +60,5 @@ public class Template {
         updatedDate = LocalDateTime.now();
     }
 
-    public enum TemplateStatus {
-        PENDING,
-        IN_PROGRESS,
-        COMPLETED
-    }
+
 }

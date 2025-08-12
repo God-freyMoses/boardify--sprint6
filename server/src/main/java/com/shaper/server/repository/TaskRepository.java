@@ -11,13 +11,23 @@ import java.util.List;
 @Repository
 public interface TaskRepository extends JpaRepository<Task, Integer> {
     
-    List<Task> findByStatus(Task.TaskStatus status);
+    List<Task> findByStatus(com.shaper.server.model.enums.TaskStatus status);
+    
+    List<Task> findByTaskType(com.shaper.server.model.enums.TaskType taskType);
     
     List<Task> findByRequiresSignature(boolean requiresSignature);
     
-    @Query("SELECT t FROM Task t JOIN t.templates temp WHERE temp.id = :templateId ORDER BY t.createdAt ASC")
-    List<Task> findByTemplateId(@Param("templateId") Integer templateId);
+    List<Task> findByTemplate_IdOrderByOrderIndexAsc(Integer templateId);
     
-    @Query("SELECT t FROM Task t JOIN t.templates temp JOIN temp.createdByHr hr WHERE hr.id = :hrId")
+    @Query("SELECT t FROM Task t WHERE t.template.id = :templateId ORDER BY t.orderIndex ASC")
+    List<Task> findByTemplateIdOrderedByIndex(@Param("templateId") Integer templateId);
+    
+    @Query("SELECT t FROM Task t WHERE t.template.createdByHr.id = :hrId")
     List<Task> findByHrId(@Param("hrId") java.util.UUID hrId);
+    
+    @Query("SELECT MAX(t.orderIndex) FROM Task t WHERE t.template.id = :templateId")
+    Integer findMaxOrderIndexByTemplateId(@Param("templateId") Integer templateId);
+    
+    @Query("SELECT COUNT(t) FROM Task t WHERE t.template.id = :templateId")
+    long countByTemplateId(@Param("templateId") Integer templateId);
 }

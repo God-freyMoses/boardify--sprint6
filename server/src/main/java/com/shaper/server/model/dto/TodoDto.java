@@ -22,7 +22,7 @@ public class TodoDto {
     private boolean requiresSignature;
     private Integer templateId;
     private String templateTitle;
-    private Todo.TodoStatus status;
+    private com.shaper.server.model.enums.TodoStatus status;
     private LocalDateTime completedAt;
     private LocalDateTime dueDate;
     private LocalDateTime reminderSentAt;

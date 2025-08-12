@@ -1,11 +1,15 @@
 package com.shaper.server.service.impl;
 
+import com.shaper.server.exception.DataNotFoundException;
 import com.shaper.server.model.dto.TodoDto;
 import com.shaper.server.model.entity.*;
+import com.shaper.server.model.enums.TodoStatus;
 import com.shaper.server.repository.*;
 import com.shaper.server.service.NotificationService;
+import com.shaper.server.service.ProgressService;
 import com.shaper.server.service.TodoService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -16,17 +20,19 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class TodoServiceImpl implements TodoService {
     
     private final TodoRepository todoRepository;
     private final TemplateRepository templateRepository;
     private final HireRepository hireRepository;
     private final NotificationService notificationService;
+    private final ProgressService progressService;
     
     @Override
     public TodoDto getTodoById(Integer id) {
         Todo todo = todoRepository.findById(id)
-            .orElseThrow(() -> new RuntimeException("Todo not found"));
+            .orElseThrow(() -> new DataNotFoundException("Todo not found with ID: " + id));
         return convertToDto(todo);
     }
     
@@ -45,13 +51,25 @@ public class TodoServiceImpl implements TodoService {
     @Override
     @Transactional
     public TodoDto completeTodo(Integer id) {
-        Todo todo = todoRepository.findById(id)
-            .orElseThrow(() -> new RuntimeException("Todo not found"));
+        log.debug("Completing todo with ID: {}", id);
         
-        todo.setStatus(Todo.TodoStatus.COMPLETED);
+        Todo todo = todoRepository.findById(id)
+            .orElseThrow(() -> new DataNotFoundException("Todo not found with ID: " + id));
+        
+        if (todo.getStatus() == TodoStatus.COMPLETED) {
+            log.debug("Todo with ID: {} is already completed", id);
+            return convertToDto(todo);
+        }
+        
+        todo.setStatus(TodoStatus.COMPLETED);
         todo.setCompletedAt(LocalDateTime.now());
         
         Todo savedTodo = todoRepository.save(todo);
+        log.debug("Marked todo with ID: {} as completed", id);
+        
+        // Update progress tracking
+        progressService.updateProgressOnTodoCompletion(id);
+        log.debug("Updated progress for todo completion: {}", id);
         
         // Create notification for HR if task requires signature
         if (todo.getTask().isRequiresSignature()) {
@@ -59,6 +77,8 @@ public class TodoServiceImpl implements TodoService {
                 todo.getHire().getRegisteredByHr(), 
                 todo.getTask()
             );
+            log.debug("Created signature notification for HR user: {}", 
+                     todo.getHire().getRegisteredByHr().getId());
         }
         
         return convertToDto(savedTodo);
@@ -67,36 +87,63 @@ public class TodoServiceImpl implements TodoService {
     @Override
     @Transactional
     public void sendReminder(Integer id) {
+        log.debug("Sending reminder for todo with ID: {}", id);
+        
         Todo todo = todoRepository.findById(id)
-            .orElseThrow(() -> new RuntimeException("Todo not found"));
+            .orElseThrow(() -> new DataNotFoundException("Todo not found with ID: " + id));
         
         todo.setReminderSentAt(LocalDateTime.now());
         todoRepository.save(todo);
         
         // Create reminder notification
         notificationService.createReminderNotification(todo.getHire(), todo.getTask());
+        log.debug("Sent reminder for todo with ID: {}", id);
     }
     
     @Override
     @Transactional
     public List<TodoDto> createTodosFromTemplate(Integer templateId, UUID hireId) {
+        log.debug("Creating todos from template ID: {} for hire ID: {}", templateId, hireId);
+        
         Template template = templateRepository.findById(templateId)
-            .orElseThrow(() -> new RuntimeException("Template not found"));
+            .orElseThrow(() -> new DataNotFoundException("Template not found with ID: " + templateId));
         
         Hire hire = hireRepository.findById(hireId)
-            .orElseThrow(() -> new RuntimeException("Hire not found"));
+            .orElseThrow(() -> new DataNotFoundException("Hire not found with ID: " + hireId));
         
-        List<Todo> todos = template.getTasks().stream().map(task -> {
-            Todo todo = new Todo();
-            todo.setHire(hire);
-            todo.setTask(task);
-            todo.setTemplate(template);
-            todo.setStatus(Todo.TodoStatus.PENDING);
-            todo.setDueDate(task.getDueDate());
-            return todo;
-        }).collect(Collectors.toList());
+        if (template.getTasks() == null || template.getTasks().isEmpty()) {
+            log.warn("Template ID: {} has no tasks to create todos from", templateId);
+            return List.of();
+        }
+        
+        // Create todos from template tasks, maintaining order
+        List<Todo> todos = template.getTasks().stream()
+            .sorted((t1, t2) -> Integer.compare(t1.getOrderIndex(), t2.getOrderIndex()))
+            .map(task -> {
+                Todo todo = new Todo();
+                todo.setHire(hire);
+                todo.setTask(task);
+                todo.setTemplate(template);
+                todo.setStatus(TodoStatus.PENDING);
+                
+                // Set due date based on task type and event date
+                if (task.getEventDate() != null) {
+                    todo.setDueDate(task.getEventDate());
+                } else if (task.getDueDate() != null) {
+                    todo.setDueDate(task.getDueDate());
+                } else {
+                    // Default due date: 7 days from now for documents, 14 days for resources
+                    int daysToAdd = task.isRequiresSignature() ? 7 : 14;
+                    todo.setDueDate(LocalDateTime.now().plusDays(daysToAdd));
+                }
+                
+                return todo;
+            }).collect(Collectors.toList());
         
         List<Todo> savedTodos = todoRepository.saveAll(todos);
+        log.debug("Created {} todos from template ID: {} for hire ID: {}", 
+                 savedTodos.size(), templateId, hireId);
+        
         return savedTodos.stream().map(this::convertToDto).collect(Collectors.toList());
     }
     
@@ -107,20 +154,20 @@ public class TodoServiceImpl implements TodoService {
             return 0.0;
         }
         
-        long completedTodos = todoRepository.countByHireIdAndStatus(hireId, Todo.TodoStatus.COMPLETED);
+        long completedTodos = todoRepository.countByHireIdAndStatus(hireId, com.shaper.server.model.enums.TodoStatus.COMPLETED);
         return (double) completedTodos / totalTodos * 100.0;
     }
     
     @Override
     public Todo getTodoEntityById(Integer id) {
         return todoRepository.findById(id)
-            .orElseThrow(() -> new RuntimeException("Todo not found"));
+            .orElseThrow(() -> new DataNotFoundException("Todo not found with ID: " + id));
     }
     
     @Override
     public List<TodoDto> getOverdueTodos() {
         List<Todo> overdueTodos = todoRepository.findOverdueTodos(
-            Todo.TodoStatus.PENDING, 
+            TodoStatus.PENDING, 
             LocalDateTime.now()
         );
         return overdueTodos.stream().map(this::convertToDto).collect(Collectors.toList());
@@ -144,13 +191,18 @@ public class TodoServiceImpl implements TodoService {
         dto.setCreatedAt(todo.getCreatedAt());
         dto.setUpdatedAt(todo.getUpdatedAt());
         
-        // Determine task type based on task properties
-        if (todo.getTask().isRequiresSignature()) {
-            dto.setTaskType("DOCUMENT");
-        } else if (todo.getTask().getDueDate() != null) {
-            dto.setTaskType("EVENT");
+        // Set task type from the task entity
+        if (todo.getTask().getTaskType() != null) {
+            dto.setTaskType(todo.getTask().getTaskType().name());
         } else {
-            dto.setTaskType("RESOURCE");
+            // Fallback logic for backward compatibility
+            if (todo.getTask().isRequiresSignature()) {
+                dto.setTaskType("DOCUMENT");
+            } else if (todo.getTask().getEventDate() != null) {
+                dto.setTaskType("EVENT");
+            } else {
+                dto.setTaskType("RESOURCE");
+            }
         }
         
         return dto;

@@ -111,7 +111,7 @@ public class DocumentServiceImpl implements DocumentService {
     
     @Override
     public List<DocumentDto> getDocumentsByTemplateId(Integer templateId) {
-        List<Document> documents = documentRepository.findByTask_Templates_Id(templateId);
+        List<Document> documents = documentRepository.findByTask_Template_Id(templateId);
         return documents.stream()
             .map(doc -> convertToDto(doc, 0L, null))
             .collect(Collectors.toList());
@@ -166,7 +166,7 @@ public class DocumentServiceImpl implements DocumentService {
         
         // For template uploads, we'll associate the document with the first task of the template
         // or create a general template task if no tasks exist
-        Task firstTask = taskRepository.findByTemplateId(templateId).stream()
+        Task firstTask = taskRepository.findByTemplate_IdOrderByOrderIndexAsc(templateId).stream()
             .findFirst()
             .orElseThrow(() -> new RuntimeException("Template has no tasks to associate document with"));
         

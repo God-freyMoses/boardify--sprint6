@@ -34,7 +34,7 @@ public class Todo {
     
     @Enumerated(EnumType.STRING)
     @Column(name = "status", nullable = false)
-    private TodoStatus status;
+    private com.shaper.server.model.enums.TodoStatus status;
     
     @Column(name = "completed_at")
     private LocalDateTime completedAt;
@@ -56,7 +56,7 @@ public class Todo {
         createdAt = LocalDateTime.now();
         updatedAt = LocalDateTime.now();
         if (status == null) {
-            status = TodoStatus.PENDING;
+            status = com.shaper.server.model.enums.TodoStatus.PENDING;
         }
         if (dueDate == null && task != null) {
             dueDate = task.getDueDate();
@@ -66,15 +66,10 @@ public class Todo {
     @PreUpdate
     protected void onUpdate() {
         updatedAt = LocalDateTime.now();
-        if (status == TodoStatus.COMPLETED && completedAt == null) {
+        if (status == com.shaper.server.model.enums.TodoStatus.COMPLETED && completedAt == null) {
             completedAt = LocalDateTime.now();
         }
     }
 
-    public enum TodoStatus {
-        PENDING,
-        IN_PROGRESS,
-        COMPLETED,
-        OVERDUE
-    }
+
 }
