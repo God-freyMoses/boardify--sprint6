@@ -5,7 +5,6 @@ import { Store } from '@ngrx/store';
 import { Observable } from 'rxjs';
 import { selectUser } from '../../../auth/store/auth.selectors';
 import { UserType } from '../../../auth/model/auth.model';
-import { AuthDebugService } from '../../../auth/service/auth-debug.service';
 import * as AuthActions from '../../../auth/store/auth.actions';
 // import { FullCalendarModule } from '@fullcalendar/angular';
 // import dayGridPlugin from '@fullcalendar/daygrid';
@@ -23,16 +22,13 @@ import * as AuthActions from '../../../auth/store/auth.actions';
 export class DashboardComponent implements OnInit {
   private router = inject(Router);
   private store = inject(Store);
-  private authDebugService = inject(AuthDebugService);
-  
+
   user$: Observable<UserType | null> = this.store.select(selectUser);
   currentUser: UserType | null = null;
-  
+
   ngOnInit() {
-    // Debug auth state
-    console.log('Dashboard component initializing...');
-    this.authDebugService.checkAuthState();
-    
+
+
     this.user$.subscribe(user => {
       this.currentUser = user;
       console.log('Dashboard component - current user:', this.currentUser);
@@ -70,6 +66,12 @@ export class DashboardComponent implements OnInit {
 
   logout() {
     this.store.dispatch(AuthActions.LOGOUT());
+    //clear localStorage
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+    localStorage.removeItem('auth');
+    console.log('User logged out. Redirecting to login page...');
+    // Redirect to login page
     this.router.navigate(['/login']);
   }
 

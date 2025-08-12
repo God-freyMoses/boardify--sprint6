@@ -166,11 +166,11 @@ GET http://localhost:8080/api/tasks/status/PENDING
 POST http://localhost:8080/api/documents/upload
 Content-Type: multipart/form-data
 
-# Note: Use form data with 'file' and 'taskId' parameters
-# file: [select file]
-# taskId: 1
 
-###
+{
+  "file": "test-document.txt",
+  "taskId": 1
+}
 
 # Get document by ID
 GET http://localhost:8080/api/documents/1

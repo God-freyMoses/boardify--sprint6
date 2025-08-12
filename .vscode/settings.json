@@ -7,8 +7,8 @@
             "port": 5432,
             "askForPassword": true,
             "driver": "PostgreSQL",
-            "name": "BORDIFY-BE",
-            "database": "BoardifyDB",
+            "name": "boardify-BE-12Aug",
+            "database": "boardifyDB",
             "username": "postgres"
         }
     ]

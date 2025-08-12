@@ -60,14 +60,3 @@ Content-Type: application/json
 GET {{SERVER}}/api/departments
 Content-Type: application/json
 
-##### VERIFICATION RESULTS
-# Successfully created departments:
-# 1. Engineering (ID: 1)
-# 2. Marketing (ID: 2) 
-# 3. Human Resources (ID: 3)
-# 4. Sales (ID: 4)
-# 5. Finance (ID: 5)
-# 6. IT Support (ID: 52)
-#
-# All departments are now available in the database
-# and can be selected from the dropdown in the frontend
