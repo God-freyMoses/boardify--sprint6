@@ -32,4 +32,19 @@ public class Company {
     
     @OneToOne(mappedBy = "company", cascade = CascadeType.ALL)
     private CompanySub subscription;
+
+    public void setAddress(String string) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'setAddress'");
+    }
+
+    public void setContactEmail(String string) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'setContactEmail'");
+    }
+
+    public void setContactPhone(String string) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'setContactPhone'");
+    }
 }

@@ -44,4 +44,9 @@ public class Hire extends User {
 
         setRole(UserRole.NEW_HIRE);
     }
+
+    public CompanyDepartment getCompany() {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'getCompany'");
+    }
 }

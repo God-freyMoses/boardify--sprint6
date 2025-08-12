@@ -60,5 +60,15 @@ public class Template {
         updatedDate = LocalDateTime.now();
     }
 
+    public void setHrUser(HrUser testHrUser) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'setHrUser'");
+    }
+
+    public CompanyDepartment getCompany() {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'getCompany'");
+    }
+
 
 }

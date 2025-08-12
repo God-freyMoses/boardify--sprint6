@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -206,5 +207,79 @@ public class TodoServiceImpl implements TodoService {
         }
         
         return dto;
+    }
+    
+    @Override
+    public List<TodoDto> getTodosByHireIdAndStatus(UUID hireId, TodoStatus status) {
+        List<Todo> todos = todoRepository.findByHire_IdAndStatusOrderByDueDateAsc(hireId, status);
+        return todos.stream().map(this::convertToDto).collect(Collectors.toList());
+    }
+    
+    @Override
+    public List<TodoDto> getTodosByStatus(TodoStatus status) {
+        List<Todo> todos = todoRepository.findByStatusOrderByDueDateAsc(status);
+        return todos.stream().map(this::convertToDto).collect(Collectors.toList());
+    }
+    
+    @Override
+    public List<TodoDto> getTodosByTemplateId(Integer templateId) {
+        List<Todo> todos = todoRepository.findByTemplate_Id(templateId);
+        return todos.stream().map(this::convertToDto).collect(Collectors.toList());
+    }
+    
+    @Override
+    public List<TodoDto> getPendingTodosByHireId(UUID hireId) {
+        return getTodosByHireIdAndStatus(hireId, TodoStatus.PENDING);
+    }
+    
+    @Override
+    public List<TodoDto> getCompletedTodosByHireId(UUID hireId) {
+        return getTodosByHireIdAndStatus(hireId, TodoStatus.COMPLETED);
+    }
+    
+    @Override
+    @Transactional
+    public List<TodoDto> markMultipleTodosComplete(List<Integer> todoIds) {
+        log.debug("Marking {} todos as complete", todoIds.size());
+        
+        List<TodoDto> completedTodos = new ArrayList<>();
+        for (Integer todoId : todoIds) {
+            try {
+                TodoDto completed = completeTodo(todoId);
+                completedTodos.add(completed);
+            } catch (Exception e) {
+                log.warn("Failed to complete todo with ID: {}", todoId, e);
+            }
+        }
+        
+        return completedTodos;
+    }
+    
+    @Override
+    @Transactional
+    public TodoDto markTodoInProgress(Integer id) {
+        log.debug("Marking todo with ID: {} as in progress", id);
+        
+        Todo todo = todoRepository.findById(id)
+            .orElseThrow(() -> new DataNotFoundException("Todo not found with ID: " + id));
+        
+        todo.setStatus(TodoStatus.IN_PROGRESS);
+        Todo savedTodo = todoRepository.save(todo);
+        
+        return convertToDto(savedTodo);
+    }
+    
+    @Override
+    @Transactional
+    public TodoDto markTodoOverdue(Integer id) {
+        log.debug("Marking todo with ID: {} as overdue", id);
+        
+        Todo todo = todoRepository.findById(id)
+            .orElseThrow(() -> new DataNotFoundException("Todo not found with ID: " + id));
+        
+        todo.setStatus(TodoStatus.OVERDUE);
+        Todo savedTodo = todoRepository.save(todo);
+        
+        return convertToDto(savedTodo);
     }
 }

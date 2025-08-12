@@ -29,9 +29,19 @@ public class Document {
     @Column(name = "requires_signature")
     private boolean requiresSignature;
     
+    @Column(name = "file_size")
+    private Long fileSize;
+    
+    @Column(name = "content_type")
+    private String contentType;
+    
     @ManyToOne
     @JoinColumn(name = "task_id", nullable = false)
     private Task task;
+    
+    @ManyToOne
+    @JoinColumn(name = "todo_id")
+    private Todo todo;
     
     @Column(name = "uploaded_at", nullable = false)
     private LocalDateTime uploadedAt;

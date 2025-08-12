@@ -1,6 +1,9 @@
 package com.shaper.server.model.entity;
 
 import java.time.LocalDateTime;
+
+import com.shaper.server.model.enums.NotificationType;
+
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -41,5 +44,10 @@ public class Notification {
     protected void onCreate() {
         createdAt = LocalDateTime.now();
         isRead = false;
+    }
+
+    public void setNotificationType(NotificationType reminder) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'setNotificationType'");
     }
 }

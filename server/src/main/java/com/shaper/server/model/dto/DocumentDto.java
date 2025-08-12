@@ -17,7 +17,8 @@ public class DocumentDto {
     private boolean requiresSignature;
     private Integer taskId;
     private String taskTitle;
+    private Integer todoId;
     private LocalDateTime uploadedAt;
-    private long fileSize;
+    private Long fileSize;
     private String contentType;
 }

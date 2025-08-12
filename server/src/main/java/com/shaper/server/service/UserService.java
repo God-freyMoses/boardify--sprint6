@@ -4,9 +4,11 @@ import com.shaper.server.model.dto.LoginRequestDTO;
 import com.shaper.server.model.dto.RegisterRequestDTO;
 import com.shaper.server.model.dto.UserDTO;
 import com.shaper.server.model.dto.UserTokenDTO;
+import com.shaper.server.model.entity.User;
 
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 public interface UserService {
 
@@ -24,4 +26,6 @@ public interface UserService {
 
     // GET HR USER BY COMPANY ID
     Map<String, Object> getHrUserByCompanyId(Integer companyId);
+
+    User findById(UUID userId);
 }

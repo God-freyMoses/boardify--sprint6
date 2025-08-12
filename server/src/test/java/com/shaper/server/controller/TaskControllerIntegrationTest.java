@@ -26,7 +26,7 @@ import static org.hamcrest.Matchers.*;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-import static org.hamcrest.Matchers.containsString;
+// Remove this line: import static org.hamcrest.Matchers.containsString;
 
 @SpringBootTest
 @AutoConfigureWebMvc
@@ -74,7 +74,7 @@ public class TaskControllerIntegrationTest {
         testHrUser.setPassword("password");
         testHrUser.setFirstName("HR");
         testHrUser.setLastName("Manager");
-        testHrUser.setRole(UserRole.HR);
+        testHrUser.setRole(UserRole.HR_MANAGER); // ✅ This is correct
         testHrUser.setCompany(testCompany);
         testHrUser = hrUserRepository.save(testHrUser);
 
@@ -164,7 +164,7 @@ public class TaskControllerIntegrationTest {
                 .with(csrf()))
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.success").value(false))
-                .andExpect(jsonPath("$.message").containsString("Task not found"));
+                .andExpect(jsonPath("$.message").value("Task not found"));
     }
 
     @Test
@@ -231,7 +231,7 @@ public class TaskControllerIntegrationTest {
                 .with(csrf()))
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.success").value(false))
-                .andExpect(jsonPath("$.message").containsString("Task not found"));
+                .andExpect(jsonPath("$.message").value("Task not found"));
     }
 
     @Test

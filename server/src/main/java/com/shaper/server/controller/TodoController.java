@@ -1,6 +1,7 @@
 package com.shaper.server.controller;
 
 import com.shaper.server.model.dto.TodoDto;
+import com.shaper.server.model.enums.TodoStatus;
 import com.shaper.server.service.TodoService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -95,6 +96,90 @@ public class TodoController {
             return ResponseEntity.ok(overdueTodos);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+    
+    // Add these endpoints to the existing TodoController:
+    
+    @GetMapping("/hire/{hireId}/status/{status}")
+    public ResponseEntity<List<TodoDto>> getTodosByHireIdAndStatus(
+            @PathVariable UUID hireId, 
+            @PathVariable TodoStatus status) {
+        try {
+            List<TodoDto> todos = todoService.getTodosByHireIdAndStatus(hireId, status);
+            return ResponseEntity.ok(todos);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+    
+    @GetMapping("/status/{status}")
+    public ResponseEntity<List<TodoDto>> getTodosByStatus(@PathVariable TodoStatus status) {
+        try {
+            List<TodoDto> todos = todoService.getTodosByStatus(status);
+            return ResponseEntity.ok(todos);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+    
+    @GetMapping("/template/{templateId}")
+    public ResponseEntity<List<TodoDto>> getTodosByTemplateId(@PathVariable Integer templateId) {
+        try {
+            List<TodoDto> todos = todoService.getTodosByTemplateId(templateId);
+            return ResponseEntity.ok(todos);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+    
+    @GetMapping("/hire/{hireId}/pending")
+    public ResponseEntity<List<TodoDto>> getPendingTodosByHireId(@PathVariable UUID hireId) {
+        try {
+            List<TodoDto> todos = todoService.getPendingTodosByHireId(hireId);
+            return ResponseEntity.ok(todos);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+    
+    @GetMapping("/hire/{hireId}/completed")
+    public ResponseEntity<List<TodoDto>> getCompletedTodosByHireId(@PathVariable UUID hireId) {
+        try {
+            List<TodoDto> todos = todoService.getCompletedTodosByHireId(hireId);
+            return ResponseEntity.ok(todos);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+    
+    @PutMapping("/bulk-complete")
+    public ResponseEntity<List<TodoDto>> markMultipleTodosComplete(@RequestBody List<Integer> todoIds) {
+        try {
+            List<TodoDto> completedTodos = todoService.markMultipleTodosComplete(todoIds);
+            return ResponseEntity.ok(completedTodos);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+        }
+    }
+    
+    @PutMapping("/{id}/in-progress")
+    public ResponseEntity<TodoDto> markTodoInProgress(@PathVariable Integer id) {
+        try {
+            TodoDto todo = todoService.markTodoInProgress(id);
+            return ResponseEntity.ok(todo);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
+    }
+    
+    @PutMapping("/{id}/overdue")
+    public ResponseEntity<TodoDto> markTodoOverdue(@PathVariable Integer id) {
+        try {
+            TodoDto todo = todoService.markTodoOverdue(id);
+            return ResponseEntity.ok(todo);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
     }
 }

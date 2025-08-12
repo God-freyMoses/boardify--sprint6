@@ -260,4 +260,12 @@ public class UserServiceImpl implements UserService {
         return hrUserMap;
     }
 
+
+
+    @Override
+    public User findById(UUID userId) {
+        // TODO Auto-generated method stub
+        return userRepository.findById(userId).orElse(null);
+    }
+
 }

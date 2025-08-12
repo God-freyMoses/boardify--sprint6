@@ -3,6 +3,7 @@ package com.shaper.server.controller;
 import com.shaper.server.model.dto.DocumentDto;
 import com.shaper.server.service.DocumentService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
@@ -13,11 +14,13 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/documents")
 @RequiredArgsConstructor
 @CrossOrigin(origins = "http://localhost:4200")
+@Slf4j
 public class DocumentController {
     
     private final DocumentService documentService;
@@ -26,29 +29,30 @@ public class DocumentController {
     public ResponseEntity<DocumentDto> uploadDocument(
             @RequestParam("file") MultipartFile file,
             @RequestParam(value = "taskId", required = false) Integer taskId,
+            @RequestParam(value = "todoId", required = false) Integer todoId,
             @RequestParam(value = "templateId", required = false) Integer templateId) {
-        System.out.println("=== DOCUMENT CONTROLLER UPLOAD ENDPOINT CALLED ===");
-        System.out.println("File: " + (file != null ? file.getOriginalFilename() : "null"));
-        System.out.println("TaskId: " + taskId);
-        System.out.println("TemplateId: " + templateId);
+        
+        log.info("Document upload request - File: {}, TaskId: {}, TodoId: {}, TemplateId: {}", 
+                file.getOriginalFilename(), taskId, todoId, templateId);
         
         try {
             DocumentDto uploadedDocument;
+            
             if (taskId != null) {
-                System.out.println("Uploading to task: " + taskId);
                 uploadedDocument = documentService.uploadDocument(file, taskId);
+            } else if (todoId != null) {
+                uploadedDocument = documentService.uploadDocumentToTodo(file, todoId);
             } else if (templateId != null) {
-                System.out.println("Uploading to template: " + templateId);
                 uploadedDocument = documentService.uploadDocumentToTemplate(file, templateId);
             } else {
-                System.out.println("ERROR: Neither taskId nor templateId provided");
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(null);
             }
-            System.out.println("Upload successful, returning document: " + uploadedDocument.getName());
+            
             return ResponseEntity.status(HttpStatus.CREATED).body(uploadedDocument);
+            
         } catch (Exception e) {
-            System.out.println("ERROR in DocumentController: " + e.getMessage());
-            e.printStackTrace();
+            log.error("Document upload failed: {}", e.getMessage(), e);
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         }
     }
@@ -59,6 +63,7 @@ public class DocumentController {
             DocumentDto document = documentService.getDocumentById(id);
             return ResponseEntity.ok(document);
         } catch (Exception e) {
+            log.error("Failed to get document by ID {}: {}", id, e.getMessage());
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
     }
@@ -69,6 +74,18 @@ public class DocumentController {
             List<DocumentDto> documents = documentService.getDocumentsByTaskId(taskId);
             return ResponseEntity.ok(documents);
         } catch (Exception e) {
+            log.error("Failed to get documents by task ID {}: {}", taskId, e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+    
+    @GetMapping("/todo/{todoId}")
+    public ResponseEntity<List<DocumentDto>> getDocumentsByTodoId(@PathVariable Integer todoId) {
+        try {
+            List<DocumentDto> documents = documentService.getDocumentsByTodoId(todoId);
+            return ResponseEntity.ok(documents);
+        } catch (Exception e) {
+            log.error("Failed to get documents by todo ID {}: {}", todoId, e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
@@ -79,6 +96,18 @@ public class DocumentController {
             List<DocumentDto> documents = documentService.getDocumentsByTemplateId(templateId);
             return ResponseEntity.ok(documents);
         } catch (Exception e) {
+            log.error("Failed to get documents by template ID {}: {}", templateId, e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+    
+    @GetMapping("/hire/{hireId}")
+    public ResponseEntity<List<DocumentDto>> getDocumentsByHireId(@PathVariable UUID hireId) {
+        try {
+            List<DocumentDto> documents = documentService.getDocumentsByHireId(hireId);
+            return ResponseEntity.ok(documents);
+        } catch (Exception e) {
+            log.error("Failed to get documents by hire ID {}: {}", hireId, e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
@@ -89,23 +118,33 @@ public class DocumentController {
             documentService.deleteDocument(id);
             return ResponseEntity.noContent().build();
         } catch (Exception e) {
+            log.error("Failed to delete document with ID {}: {}", id, e.getMessage());
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
     }
     
     @GetMapping("/{id}/download")
-    public ResponseEntity<Resource> downloadDocument(@PathVariable Integer id) {
+    public ResponseEntity<Resource> downloadDocument(
+            @PathVariable Integer id,
+            @RequestParam(value = "userId", required = false) UUID userId) {
         try {
-            byte[] documentData = documentService.downloadDocument(id);
-            DocumentDto document = documentService.getDocumentById(id);
+            byte[] documentData;
+            if (userId != null) {
+                documentData = documentService.downloadDocument(id, userId);
+            } else {
+                documentData = documentService.downloadDocument(id);
+            }
             
+            DocumentDto document = documentService.getDocumentById(id);
             ByteArrayResource resource = new ByteArrayResource(documentData);
             
             return ResponseEntity.ok()
                     .contentType(MediaType.APPLICATION_OCTET_STREAM)
                     .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + document.getName() + "\"")
                     .body(resource);
+                    
         } catch (Exception e) {
+            log.error("Failed to download document with ID {}: {}", id, e.getMessage());
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
     }
@@ -116,6 +155,7 @@ public class DocumentController {
             String downloadUrl = documentService.getDocumentDownloadUrl(id);
             return ResponseEntity.ok(downloadUrl);
         } catch (Exception e) {
+            log.error("Failed to get download URL for document with ID {}: {}", id, e.getMessage());
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
     }

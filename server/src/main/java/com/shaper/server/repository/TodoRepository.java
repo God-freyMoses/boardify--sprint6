@@ -1,6 +1,8 @@
 package com.shaper.server.repository;
 
 import com.shaper.server.model.entity.Todo;
+import com.shaper.server.model.enums.TodoStatus;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -35,4 +37,11 @@ public interface TodoRepository extends JpaRepository<Todo, Integer> {
     
     @Query("SELECT t FROM Todo t WHERE t.hire.registeredByHr.id = :hrId ORDER BY t.createdAt DESC")
     List<Todo> findByHrId(@Param("hrId") UUID hrId);
+    
+    List<Todo> findByStatusOrderByDueDateAsc(TodoStatus status);
+    
+    @Query("SELECT t FROM Todo t WHERE t.status = :status AND t.dueDate BETWEEN :startDate AND :endDate")
+    List<Todo> findByStatusAndDueDateBetween(@Param("status") TodoStatus status, 
+                                           @Param("startDate") LocalDateTime startDate, 
+                                           @Param("endDate") LocalDateTime endDate);
 }

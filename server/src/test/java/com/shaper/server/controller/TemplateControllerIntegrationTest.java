@@ -24,7 +24,7 @@ import static org.hamcrest.Matchers.*;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-import static org.hamcrest.Matchers.containsString;
+// Remove this line: import static org.hamcrest.Matchers.containsString;
 
 @SpringBootTest
 @AutoConfigureWebMvc
@@ -159,7 +159,7 @@ public class TemplateControllerIntegrationTest {
                 .with(csrf()))
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.success").value(false))
-                .andExpect(jsonPath("$.message").containsString("Template not found"));
+                .andExpect(jsonPath("$.message").value("Template not found"));
     }
 
     @Test
@@ -273,7 +273,7 @@ public class TemplateControllerIntegrationTest {
                 .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.success").value(true))
-                .andExpect(jsonPath("$.message").containsString("Template assigned to 1 hires successfully"));
+                .andExpect(jsonPath("$.message").value("Template assigned to 1 hires successfully"));
     }
 
     @Test
@@ -301,6 +301,6 @@ public class TemplateControllerIntegrationTest {
                 .with(csrf()))
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.success").value(false))
-                .andExpect(jsonPath("$.message").containsString("Template not found"));
+                .andExpect(jsonPath("$.message").value("Template not found"));
     }
 }
